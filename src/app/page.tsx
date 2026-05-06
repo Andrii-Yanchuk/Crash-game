@@ -11,7 +11,11 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#07080F] font-sans">
-      {username ? <GameLayout onLogout={logout} /> : <Login onLogin={login} />}
+      {username ? (
+        <GameLayout username={username} onLogout={logout} />
+      ) : (
+        <Login onLogin={login} />
+      )}
     </div>
   );
 }

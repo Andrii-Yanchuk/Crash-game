@@ -1,4 +1,5 @@
 import { socket } from "@/lib/socket";
+import { getTemporaryApiKey } from "@/lib/apiKey";
 import { useEffect } from "react";
 
 export function useSocket(username: string | null) {
@@ -9,7 +10,7 @@ export function useSocket(username: string | null) {
     }
 
     socket.auth = {
-      apiKey: username,
+      apiKey: getTemporaryApiKey(username),
     };
 
     socket.connect();
