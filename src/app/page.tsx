@@ -1,13 +1,14 @@
 "use client";
 
 import { Login } from "@/components/Login";
-import { useSyncExternalStore } from "react";
+import { socket } from "@/lib/socket";
+import { useEffect, useSyncExternalStore } from "react";
 
 const USERNAME_STORAGE_KEY = "crash-game-username";
 const USERNAME_CHANGE_EVENT = "crash-game-username-change";
 
 function getStoredUsername() {
-  return localStorage.getItem(USERNAME_STORAGE_KEY);
+  return sessionStorage.getItem(USERNAME_STORAGE_KEY);
 }
 
 function getServerUsername() {
@@ -15,11 +16,9 @@ function getServerUsername() {
 }
 
 function subscribeToUsername(callback: () => void) {
-  window.addEventListener("storage", callback);
   window.addEventListener(USERNAME_CHANGE_EVENT, callback);
 
   return () => {
-    window.removeEventListener("storage", callback);
     window.removeEventListener(USERNAME_CHANGE_EVENT, callback);
   };
 }
@@ -31,13 +30,32 @@ export default function Home() {
     getServerUsername,
   );
 
+  useEffect(() => {
+    if (!username) {
+      socket.disconnect();
+      return;
+    }
+
+    socket.auth = {
+      apiKey: username,
+    };
+
+    socket.connect();
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [username]);
+
   function handleLogin(nextUsername: string) {
-    localStorage.setItem(USERNAME_STORAGE_KEY, nextUsername);
+    sessionStorage.setItem(USERNAME_STORAGE_KEY, nextUsername);
     window.dispatchEvent(new Event(USERNAME_CHANGE_EVENT));
   }
 
   function handleLogout() {
-    localStorage.removeItem(USERNAME_STORAGE_KEY);
+    socket.disconnect();
+
+    sessionStorage.removeItem(USERNAME_STORAGE_KEY);
     window.dispatchEvent(new Event(USERNAME_CHANGE_EVENT));
   }
 
@@ -48,7 +66,6 @@ export default function Home() {
           <h1 className="text-3xl font-semibold">
             Welcome, <span className="text-[#FBBF24]">{username}</span>
           </h1>
-          <p className="text-[#7A8599]">Home page is shown after login.</p>
           <button
             type="button"
             onClick={handleLogout}
