@@ -1,5 +1,11 @@
 import { socket } from "@/lib/socket";
+import { useGameStore } from "@/stores/game";
+import { RoundStateEvent } from "@/types/type";
 import { useEffect } from "react";
+
+function handleRoundState(event: RoundStateEvent) {
+  useGameStore.getState().applyRoundState(event);
+}
 
 export function useSocket(username: string | null) {
   useEffect(() => {
@@ -12,9 +18,11 @@ export function useSocket(username: string | null) {
       apiKey: username,
     };
 
+    socket.on("round:state", handleRoundState);
     socket.connect();
 
     return () => {
+      socket.off("round:state", handleRoundState);
       socket.disconnect();
     };
   }, [username]);
