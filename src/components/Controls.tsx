@@ -10,7 +10,7 @@ interface ControlsProps {
 }
 
 export function Controls({ username }: ControlsProps) {
-  const [amount, setAmount] = useState("10");
+  const [amount, setAmount] = useState(10);
   const [isAutoCashOutEnabled, setIsAutoCashOutEnabled] = useState(false);
   const {
     data: balance,
@@ -18,6 +18,22 @@ export function Controls({ username }: ControlsProps) {
     isLoading: isBalanceLoading,
     isError: isBalanceError,
   } = useBalance(username);
+
+  function handleQuickAction(action: string) {
+    if (action === "1/2") {
+      setAmount(amount / 2);
+      return;
+    }
+
+    if (action === "x2") {
+      setAmount(amount * 2);
+      return;
+    }
+
+    if (action === "Max" && typeof balance === "number") {
+      setAmount(balance);
+    }
+  }
 
   return (
     <section className="flex flex-col rounded-xl border border-[#1A1F2E] bg-[#0E1119] p-3">
@@ -34,7 +50,7 @@ export function Controls({ username }: ControlsProps) {
           type="number"
           min="0"
           value={amount}
-          onChange={(event) => setAmount(event.target.value)}
+          onChange={(event) => setAmount(event.target.valueAsNumber || 0)}
           className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
         <span className="ml-3 shrink-0 text-sm font-medium text-[#7A8599]">
@@ -47,6 +63,7 @@ export function Controls({ username }: ControlsProps) {
           <button
             key={action}
             type="button"
+            onClick={() => handleQuickAction(action)}
             className="h-6 rounded-md border border-[#1A1F2E] bg-[#111620] text-xs font-medium text-[#7A8599] transition hover:bg-[#1A1F2E] cursor-pointer"
           >
             {action}
