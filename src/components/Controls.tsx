@@ -1,6 +1,7 @@
 "use client";
 
 import { useBalance } from "@/hooks/useBalance";
+import { useGameStore } from "@/stores/game";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -13,8 +14,8 @@ interface ControlsProps {
 export function Controls({ username }: ControlsProps) {
   const [amount, setAmount] = useState(10);
   const [isAutoCashOutEnabled, setIsAutoCashOutEnabled] = useState(false);
+  const balance = useGameStore((state) => state.balance);
   const {
-    data: balance,
     error: balanceError,
     isLoading: isBalanceLoading,
     isError: isBalanceError,
