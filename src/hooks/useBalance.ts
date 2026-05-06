@@ -1,5 +1,4 @@
-import { API_URL } from "@/config/api";
-import { getTemporaryApiKey } from "@/lib/apiKey";
+import { api } from "@/lib/apiClient";
 import { useQuery } from "@tanstack/react-query";
 
 type BalanceResponse = {
@@ -7,17 +6,7 @@ type BalanceResponse = {
 };
 
 async function fetchBalance(username: string) {
-  const response = await fetch(`${API_URL}/api/balance`, {
-    headers: {
-      "X-API-Key": getTemporaryApiKey(username),
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to load balance");
-  }
-
-  const data = (await response.json()) as BalanceResponse;
+  const data = await api<BalanceResponse>("/api/balance", { username });
 
   return data.balance;
 }
