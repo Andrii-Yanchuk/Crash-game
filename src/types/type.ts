@@ -1,4 +1,4 @@
-export type RoundPhase = "waiting" | "running" | "crashed";
+export type RoundPhase = "waiting" | "start" | "tick" | "crash";
 export type PlayerStatus = "placed" | "cashed_out" | "lost";
 
 export type PublicPlayer = {

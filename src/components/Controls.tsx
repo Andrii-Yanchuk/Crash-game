@@ -7,6 +7,29 @@ import { useState } from "react";
 
 const QUICK_ACTIONS = ["1/2", "x2", "Max"];
 
+const BET_BUTTON_STATE = {
+  waiting: {
+    label: "Place bet",
+    className: "bg-[#FBBF24] text-black",
+    disabled: false,
+  },
+  start: {
+    label: "Wait for next round",
+    className: "bg-[#4A5568] text-white",
+    disabled: true,
+  },
+  tick: {
+    label: "Cash Out",
+    className: "bg-[#22C55E] text-black",
+    disabled: false,
+  },
+  crash: {
+    label: "Crashed",
+    className: "bg-[#EF4444] text-white",
+    disabled: true,
+  },
+} as const;
+
 interface ControlsProps {
   username: string;
 }
@@ -21,7 +44,7 @@ export function Controls({ username }: ControlsProps) {
     isError: isBalanceError,
   } = useBalance(username);
   const phase = useGameStore((state) => state.phase);
-  const canPlaceBet = phase === "waiting";
+  const betButtonState = BET_BUTTON_STATE[phase];
 
   function handleQuickAction(action: string) {
     if (action === "1/2") {
@@ -98,10 +121,10 @@ export function Controls({ username }: ControlsProps) {
 
       <button
         type="button"
-        className="mb-4 h-[52px] rounded-[9px] bg-[#FBBF24] font-semibold text-black cursor-pointer disabled:cursor-not-allowed"
-        disabled={!canPlaceBet}
+        className={`mb-4 h-[52px] rounded-[9px] font-semibold cursor-pointer transition disabled:cursor-not-allowed ${betButtonState.className}`}
+        disabled={betButtonState.disabled}
       >
-        Place bet
+        {betButtonState.label}
       </button>
 
       <div className="flex items-center justify-between border-t border-[#1A1F2E] pt-4">
