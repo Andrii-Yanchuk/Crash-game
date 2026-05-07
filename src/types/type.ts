@@ -75,3 +75,23 @@ export interface BetCashedOutEvent {
   profit: number;
   balance: number;
 }
+
+export interface BetLostEvent {
+  betId: string;
+  crashPoint: number;
+  balance: number;
+}
+
+export type BetRejectedReason =
+  | "betting_closed"
+  | "already_has_bet"
+  | "no_active_bet"
+  | "not_running"
+  | "insufficient_balance"
+  | "invalid_auto_cashout"
+  | "invalid_payload";
+
+export interface BetRejectedEvent {
+  reason: BetRejectedReason;
+  message: string;
+}

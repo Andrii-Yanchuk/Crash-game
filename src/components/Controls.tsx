@@ -44,6 +44,8 @@ export function Controls({ username }: ControlsProps) {
     isError: isBalanceError,
   } = useBalance(username);
   const phase = useGameStore((state) => state.phase);
+  const isBetPending = useGameStore((state) => state.isBetPending);
+  const betError = useGameStore((state) => state.betError);
   const betButtonState = BET_BUTTON_STATE[phase];
 
   function handleQuickAction(action: string) {
@@ -122,10 +124,13 @@ export function Controls({ username }: ControlsProps) {
       <button
         type="button"
         className={`mb-4 h-[52px] rounded-[9px] font-semibold cursor-pointer transition disabled:cursor-not-allowed ${betButtonState.className}`}
-        disabled={betButtonState.disabled}
+        disabled={betButtonState.disabled || isBetPending}
       >
-        {betButtonState.label}
+        {isBetPending ? "Loading..." : betButtonState.label}
       </button>
+      {betError ? (
+        <p className="mb-3 text-xs font-medium text-red-400">{betError}</p>
+      ) : null}
 
       <div className="flex items-center justify-between border-t border-[#1A1F2E] pt-4">
         <div className="flex items-center gap-2">

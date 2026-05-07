@@ -3,7 +3,9 @@ import { useGameStore } from "@/stores/game";
 import { useRecentStore } from "@/stores/recent";
 import {
   BetCashedOutEvent,
+  BetLostEvent,
   BetPlacedEvent,
+  BetRejectedEvent,
   RoundCrashEvent,
   RoundStartEvent,
   RoundStateEvent,
@@ -93,6 +95,8 @@ function handleRoundCrash(event: RoundCrashEvent) {
 function handleBetPlaced(event: BetPlacedEvent) {
   useGameStore.setState({
     balance: event.balance,
+    isBetPending: false,
+    betError: null,
     myBet: {
       betId: event.betId,
       amount: event.amount,
@@ -105,7 +109,24 @@ function handleBetPlaced(event: BetPlacedEvent) {
 function handleBetCashedOut(event: BetCashedOutEvent) {
   useGameStore.setState({
     balance: event.balance,
+    isBetPending: false,
+    betError: null,
     myBet: null,
+  });
+}
+
+function handleBetLost(event: BetLostEvent) {
+  useGameStore.setState({
+    balance: event.balance,
+    isBetPending: false,
+    myBet: null,
+  });
+}
+
+function handleBetRejected(event: BetRejectedEvent) {
+  useGameStore.setState({
+    isBetPending: false,
+    betError: event.message,
   });
 }
 
@@ -127,6 +148,8 @@ export function useSocket(username: string | null) {
     socket.on("round:crash", handleRoundCrash);
     socket.on("bet:placed", handleBetPlaced);
     socket.on("bet:cashedOut", handleBetCashedOut);
+    socket.on("bet:lost", handleBetLost);
+    socket.on("bet:rejected", handleBetRejected);
     socket.connect();
 
     return () => {
@@ -137,6 +160,8 @@ export function useSocket(username: string | null) {
       socket.off("round:crash", handleRoundCrash);
       socket.off("bet:placed", handleBetPlaced);
       socket.off("bet:cashedOut", handleBetCashedOut);
+      socket.off("bet:lost", handleBetLost);
+      socket.off("bet:rejected", handleBetRejected);
       if (crashFlashTimeout) {
         clearTimeout(crashFlashTimeout);
         crashFlashTimeout = null;
