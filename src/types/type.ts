@@ -33,3 +33,9 @@ export interface RoundStateEvent {
   } | null;
   playerCount: number;
 }
+
+export interface RoundWaitingEvent {
+  roundId: string;
+  endsAt: string;
+  playerCount: number;
+}

@@ -20,6 +20,8 @@ export function Controls({ username }: ControlsProps) {
     isLoading: isBalanceLoading,
     isError: isBalanceError,
   } = useBalance(username);
+  const phase = useGameStore((state) => state.phase);
+  const canPlaceBet = phase === "waiting";
 
   function handleQuickAction(action: string) {
     if (action === "1/2") {
@@ -97,6 +99,7 @@ export function Controls({ username }: ControlsProps) {
       <button
         type="button"
         className="mb-4 h-[52px] rounded-[9px] bg-[#FBBF24] font-semibold text-black cursor-pointer disabled:cursor-not-allowed"
+        disabled={!canPlaceBet}
       >
         Place bet
       </button>
