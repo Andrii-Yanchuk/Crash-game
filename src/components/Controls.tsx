@@ -1,6 +1,7 @@
 "use client";
 
 import { useBalance } from "@/hooks/useBalance";
+import { socket } from "@/lib/socket";
 import { useGameStore } from "@/stores/game";
 import Image from "next/image";
 import { useState } from "react";
@@ -37,6 +38,7 @@ interface ControlsProps {
 export function Controls({ username }: ControlsProps) {
   const [amount, setAmount] = useState(10);
   const [isAutoCashOutEnabled, setIsAutoCashOutEnabled] = useState(false);
+  const [autoCashOutAt, setAutoCashOutAt] = useState(2);
   const balance = useGameStore((state) => state.balance);
   const {
     error: balanceError,
@@ -44,9 +46,20 @@ export function Controls({ username }: ControlsProps) {
     isError: isBalanceError,
   } = useBalance(username);
   const phase = useGameStore((state) => state.phase);
+  const myBet = useGameStore((state) => state.myBet);
   const isBetPending = useGameStore((state) => state.isBetPending);
   const betError = useGameStore((state) => state.betError);
+  const setIsBetPending = useGameStore((state) => state.setIsBetPending);
+  const setBetError = useGameStore((state) => state.setBetError);
   const betButtonState = BET_BUTTON_STATE[phase];
+  const hasPlacedBet = phase === "waiting" && Boolean(myBet);
+  const isBetButtonDisabled =
+    betButtonState.disabled || isBetPending || hasPlacedBet;
+  const betButtonLabel = hasPlacedBet
+    ? `Bet placed · ${myBet?.amount}`
+    : isBetPending
+      ? "Loading..."
+      : betButtonState.label;
 
   function handleQuickAction(action: string) {
     if (action === "1/2") {
@@ -62,6 +75,32 @@ export function Controls({ username }: ControlsProps) {
     if (action === "Max" && typeof balance === "number") {
       setAmount(balance);
     }
+  }
+
+  function handleBetButtonClick() {
+    if (phase !== "waiting" || myBet || isBetPending) {
+      return;
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0 || amount > 10000) {
+      setBetError("Bet amount must be greater than 0 and no more than 10000.");
+      return;
+    }
+
+    if (
+      isAutoCashOutEnabled &&
+      (!Number.isFinite(autoCashOutAt) || autoCashOutAt < 1.01)
+    ) {
+      setBetError("Auto cash out must be at least 1.01x.");
+      return;
+    }
+
+    setBetError(null);
+    setIsBetPending(true);
+    socket.emit("bet:place", {
+      amount,
+      autoCashOutAt: isAutoCashOutEnabled ? autoCashOutAt : null,
+    });
   }
 
   return (
@@ -120,13 +159,31 @@ export function Controls({ username }: ControlsProps) {
           />
         </button>
       </div>
+      {isAutoCashOutEnabled ? (
+        <div className="mb-5 flex h-10 items-center rounded-[9px] border border-[#1A1F2E] bg-[#111620] px-3">
+          <input
+            type="number"
+            min="1.01"
+            step="0.01"
+            value={autoCashOutAt}
+            onChange={(event) =>
+              setAutoCashOutAt(event.target.valueAsNumber || 0)
+            }
+            className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          />
+          <span className="ml-3 shrink-0 text-sm font-medium text-[#7A8599]">
+            x
+          </span>
+        </div>
+      ) : null}
 
       <button
         type="button"
+        onClick={handleBetButtonClick}
         className={`mb-4 h-[52px] rounded-[9px] font-semibold cursor-pointer transition disabled:cursor-not-allowed ${betButtonState.className}`}
-        disabled={betButtonState.disabled || isBetPending}
+        disabled={isBetButtonDisabled}
       >
-        {isBetPending ? "Loading..." : betButtonState.label}
+        {betButtonLabel}
       </button>
       {betError ? (
         <p className="mb-3 text-xs font-medium text-red-400">{betError}</p>

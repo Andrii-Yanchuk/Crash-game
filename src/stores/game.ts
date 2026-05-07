@@ -18,6 +18,7 @@ type GameState = {
 
   setBalance: (balance: number) => void;
   setIsBetPending: (isBetPending: boolean) => void;
+  setBetError: (betError: string | null) => void;
   clearBetError: () => void;
   applyRoundState: (event: RoundStateEvent) => void;
 };
@@ -38,6 +39,7 @@ export const useGameStore = create<GameState>((set) => ({
 
   setBalance: (balance) => set({ balance }),
   setIsBetPending: (isBetPending) => set({ isBetPending }),
+  setBetError: (betError) => set({ betError }),
   clearBetError: () => set({ betError: null }),
 
   applyRoundState: (event) =>
