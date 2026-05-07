@@ -46,6 +46,7 @@ export function Controls({ username }: ControlsProps) {
     isError: isBalanceError,
   } = useBalance(username);
   const phase = useGameStore((state) => state.phase);
+  const multiplier = useGameStore((state) => state.multiplier);
   const myBet = useGameStore((state) => state.myBet);
   const isBetPending = useGameStore((state) => state.isBetPending);
   const betError = useGameStore((state) => state.betError);
@@ -53,13 +54,21 @@ export function Controls({ username }: ControlsProps) {
   const setBetError = useGameStore((state) => state.setBetError);
   const betButtonState = BET_BUTTON_STATE[phase];
   const hasPlacedBet = phase === "waiting" && Boolean(myBet);
+  const canCashOut = phase === "tick" && Boolean(myBet);
+  const projectedCashOut =
+    myBet && canCashOut ? (myBet.amount * multiplier).toFixed(2) : null;
   const isBetButtonDisabled =
-    betButtonState.disabled || isBetPending || hasPlacedBet;
-  const betButtonLabel = hasPlacedBet
-    ? `Bet placed · ${myBet?.amount}`
-    : isBetPending
-      ? "Loading..."
-      : betButtonState.label;
+    betButtonState.disabled ||
+    isBetPending ||
+    hasPlacedBet ||
+    (phase === "tick" && !myBet);
+  const betButtonLabel = isBetPending
+    ? "Loading..."
+    : canCashOut && projectedCashOut
+      ? `Cash Out - ${projectedCashOut}`
+      : hasPlacedBet
+        ? `Bet placed · ${myBet?.amount}`
+        : betButtonState.label;
 
   function handleQuickAction(action: string) {
     if (action === "1/2") {
@@ -78,6 +87,17 @@ export function Controls({ username }: ControlsProps) {
   }
 
   function handleBetButtonClick() {
+    if (phase === "tick") {
+      if (!myBet || isBetPending) {
+        return;
+      }
+
+      setBetError(null);
+      setIsBetPending(true);
+      socket.emit("bet:cashout", {});
+      return;
+    }
+
     if (phase !== "waiting" || myBet || isBetPending) {
       return;
     }
