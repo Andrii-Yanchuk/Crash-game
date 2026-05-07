@@ -39,3 +39,21 @@ export interface RoundWaitingEvent {
   endsAt: string;
   playerCount: number;
 }
+
+export interface RoundStartEvent {
+  roundId: string;
+  startedAt: string;
+  playerCount: number;
+}
+
+export interface RoundTickEvent {
+  roundId: string;
+  multiplier: number;
+  elapsedMs: number;
+}
+
+export interface RoundCrashEvent {
+  roundId: string;
+  crashPoint: number;
+  playerCount: number;
+}

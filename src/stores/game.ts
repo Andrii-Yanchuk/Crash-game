@@ -10,6 +10,7 @@ type GameState = {
   endsAt: Date | null;
   multiplier: number;
   crashPoint: number | null;
+  crashFlash: boolean;
   myBet: MyBet | null;
   playerCount: number;
 
@@ -25,6 +26,7 @@ export const useGameStore = create<GameState>((set) => ({
   endsAt: null,
   multiplier: 1,
   crashPoint: null,
+  crashFlash: false,
   myBet: null,
   playerCount: 0,
 
