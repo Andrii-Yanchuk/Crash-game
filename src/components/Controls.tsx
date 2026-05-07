@@ -69,9 +69,9 @@ export function Controls({ username }: ControlsProps) {
       ? "Cash Out"
       : isWaitingForNextRound
         ? "Wait for next round"
-      : hasPlacedBet
-        ? `Bet placed - ${myBet?.amount}`
-        : displayedBetButtonState.label;
+        : hasPlacedBet
+          ? `Bet placed - ${myBet?.amount}`
+          : displayedBetButtonState.label;
 
   function handleQuickAction(action: string) {
     if (action === "1/2") {

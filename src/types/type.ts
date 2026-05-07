@@ -1,4 +1,5 @@
 export type RoundPhase = "waiting" | "start" | "tick" | "crash";
+export type ServerRoundPhase = RoundPhase | "running" | "crashed";
 export type PlayerStatus = "placed" | "cashed_out" | "lost";
 
 export type PublicPlayer = {
@@ -21,7 +22,7 @@ export type Bet = {
 };
 
 export interface RoundStateEvent {
-  phase: RoundPhase;
+  phase: ServerRoundPhase;
   roundId: string;
   startedAt: string | null;
   endsAt: string | null;

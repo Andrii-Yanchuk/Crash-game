@@ -1,6 +1,18 @@
 import { create } from "zustand";
 import { RoundPhase, MyBet, RoundStateEvent } from "../types/type";
 
+function normalizeRoundPhase(phase: RoundStateEvent["phase"]): RoundPhase {
+  if (phase === "running") {
+    return "tick";
+  }
+
+  if (phase === "crashed") {
+    return "crash";
+  }
+
+  return phase;
+}
+
 type GameState = {
   balance: number | null;
 
@@ -44,7 +56,7 @@ export const useGameStore = create<GameState>((set) => ({
 
   applyRoundState: (event) =>
     set({
-      phase: event.phase,
+      phase: normalizeRoundPhase(event.phase),
       roundId: event.roundId,
       startedAt: event.startedAt ? new Date(event.startedAt) : null,
       endsAt: event.endsAt ? new Date(event.endsAt) : null,
