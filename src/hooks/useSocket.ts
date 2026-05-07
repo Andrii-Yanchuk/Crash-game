@@ -2,6 +2,8 @@ import { socket } from "@/lib/socket";
 import { useGameStore } from "@/stores/game";
 import { useRecentStore } from "@/stores/recent";
 import {
+  BetCashedOutEvent,
+  BetPlacedEvent,
   RoundCrashEvent,
   RoundStartEvent,
   RoundStateEvent,
@@ -88,6 +90,25 @@ function handleRoundCrash(event: RoundCrashEvent) {
   }, 1500);
 }
 
+function handleBetPlaced(event: BetPlacedEvent) {
+  useGameStore.setState({
+    balance: event.balance,
+    myBet: {
+      betId: event.betId,
+      amount: event.amount,
+      autoCashOutAt: event.autoCashOutAt,
+      status: "placed",
+    },
+  });
+}
+
+function handleBetCashedOut(event: BetCashedOutEvent) {
+  useGameStore.setState({
+    balance: event.balance,
+    myBet: null,
+  });
+}
+
 export function useSocket(username: string | null) {
   useEffect(() => {
     if (!username) {
@@ -104,6 +125,8 @@ export function useSocket(username: string | null) {
     socket.on("round:start", handleRoundStart);
     socket.on("round:tick", handleRoundTick);
     socket.on("round:crash", handleRoundCrash);
+    socket.on("bet:placed", handleBetPlaced);
+    socket.on("bet:cashedOut", handleBetCashedOut);
     socket.connect();
 
     return () => {
@@ -112,6 +135,8 @@ export function useSocket(username: string | null) {
       socket.off("round:start", handleRoundStart);
       socket.off("round:tick", handleRoundTick);
       socket.off("round:crash", handleRoundCrash);
+      socket.off("bet:placed", handleBetPlaced);
+      socket.off("bet:cashedOut", handleBetCashedOut);
       if (crashFlashTimeout) {
         clearTimeout(crashFlashTimeout);
         crashFlashTimeout = null;

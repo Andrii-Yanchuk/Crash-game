@@ -9,6 +9,7 @@ export type PublicPlayer = {
 };
 
 export type MyBet = {
+  betId?: string;
   amount: number;
   autoCashOutAt: number | null;
   status: PlayerStatus;
@@ -27,6 +28,7 @@ export interface RoundStateEvent {
   currentMultiplier: number;
   crashPoint: number | null;
   yourBet: {
+    betId?: string;
     amount: number;
     autoCashOutAt: number | null;
     status: PlayerStatus;
@@ -56,4 +58,20 @@ export interface RoundCrashEvent {
   roundId: string;
   crashPoint: number;
   playerCount: number;
+}
+
+export interface BetPlacedEvent {
+  betId: string;
+  roundId: string;
+  amount: number;
+  autoCashOutAt: number | null;
+  balance: number;
+}
+
+export interface BetCashedOutEvent {
+  betId: string;
+  multiplier: number;
+  winAmount: number;
+  profit: number;
+  balance: number;
 }
