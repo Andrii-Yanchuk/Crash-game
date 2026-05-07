@@ -54,18 +54,24 @@ export function Controls({ username }: ControlsProps) {
   const betButtonState = BET_BUTTON_STATE[phase];
   const hasPlacedBet = phase === "waiting" && Boolean(myBet);
   const canCashOut = phase === "tick" && Boolean(myBet);
+  const isWaitingForNextRound = phase === "tick" && !myBet;
+  const displayedBetButtonState = isWaitingForNextRound
+    ? BET_BUTTON_STATE.start
+    : betButtonState;
   const isBetButtonDisabled =
-    betButtonState.disabled ||
+    displayedBetButtonState.disabled ||
     isBetPending ||
     hasPlacedBet ||
-    (phase === "tick" && !myBet);
+    isWaitingForNextRound;
   const betButtonLabel = isBetPending
     ? "Loading..."
     : canCashOut
       ? "Cash Out"
+      : isWaitingForNextRound
+        ? "Wait for next round"
       : hasPlacedBet
         ? `Bet placed - ${myBet?.amount}`
-        : betButtonState.label;
+        : displayedBetButtonState.label;
 
   function handleQuickAction(action: string) {
     if (action === "1/2") {
@@ -197,7 +203,7 @@ export function Controls({ username }: ControlsProps) {
       <button
         type="button"
         onClick={handleBetButtonClick}
-        className={`mb-4 h-[52px] rounded-[9px] font-semibold cursor-pointer transition disabled:cursor-not-allowed ${betButtonState.className}`}
+        className={`mb-4 h-[52px] rounded-[9px] font-semibold cursor-pointer transition disabled:cursor-not-allowed ${displayedBetButtonState.className}`}
         disabled={isBetButtonDisabled}
       >
         {betButtonLabel}
