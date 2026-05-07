@@ -46,9 +46,14 @@ function handleRoundStart(event: RoundStartEvent) {
 }
 
 function handleRoundTick(event: RoundTickEvent) {
+  const currentRoundId = useGameStore.getState().roundId;
+
+  if (event.roundId !== currentRoundId) {
+    return;
+  }
+
   useGameStore.setState({
     phase: "tick",
-    roundId: event.roundId,
     multiplier: event.multiplier,
   });
 }

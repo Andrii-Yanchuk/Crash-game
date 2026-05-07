@@ -52,6 +52,7 @@ export const useGameStore = create<GameState>((set) => ({
       crashPoint: event.crashPoint,
       myBet: event.yourBet,
       playerCount: event.playerCount,
+      isBetPending: false,
       betError: null,
     }),
 }));
