@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { isValidUsername, USERNAME_REQUIREMENTS } from "@/lib/username";
 
 type LoginProps = {
   onLogin: (username: string) => void;
@@ -9,16 +10,17 @@ type LoginProps = {
 
 export function Login({ onLogin }: LoginProps) {
   const [username, setUsername] = useState("");
-  const isUsernameTooShort = username.trim().length < 3;
+  const trimmedUsername = username.trim();
+  const isUsernameInvalid = !isValidUsername(trimmedUsername);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (isUsernameTooShort) {
+    if (isUsernameInvalid) {
       return;
     }
 
-    onLogin(username.trim());
+    onLogin(trimmedUsername);
   }
 
   return (
@@ -42,14 +44,17 @@ export function Login({ onLogin }: LoginProps) {
           value={username}
           onChange={(event) => setUsername(event.target.value)}
           placeholder="Enter your username"
+          aria-invalid={isUsernameInvalid}
+          autoComplete="username"
+          pattern="[A-Za-z0-9_-]{3,}"
           className="bg-[#111620] border border-[#1A1F2E] text-white px-4 py-2 mb-2 rounded focus:outline-none focus:ring-2 focus:ring-[#FBBF24] transition"
         />
         <span className="text-[#7A8599] text-xs mb-6">
-          Minimum 3 characters required
+          {USERNAME_REQUIREMENTS}
         </span>
         <button
           type="submit"
-          disabled={isUsernameTooShort}
+          disabled={isUsernameInvalid}
           className="bg-[#FBBF24] text-black font-semibold text-lg py-3.5 rounded-[10px] hover:bg-[#FBBF24CC] transition cursor-pointer disabled:bg-[#4A5568] disabled:cursor-not-allowed disabled:hover:bg-[#4A5568]"
         >
           Enter Game

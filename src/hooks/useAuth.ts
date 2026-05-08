@@ -1,10 +1,17 @@
 import { useSyncExternalStore } from "react";
+import { isValidUsername } from "@/lib/username";
 
 const USERNAME_STORAGE_KEY = "crash-game-username";
 const USERNAME_CHANGE_EVENT = "crash-game-username-change";
 
 function getStoredUsername() {
-  return sessionStorage.getItem(USERNAME_STORAGE_KEY);
+  const username = sessionStorage.getItem(USERNAME_STORAGE_KEY);
+
+  if (!username || !isValidUsername(username)) {
+    return null;
+  }
+
+  return username;
 }
 
 function getServerUsername() {
@@ -27,7 +34,13 @@ export function useAuth() {
   );
 
   function login(nextUsername: string) {
-    sessionStorage.setItem(USERNAME_STORAGE_KEY, nextUsername);
+    const username = nextUsername.trim();
+
+    if (!isValidUsername(username)) {
+      return;
+    }
+
+    sessionStorage.setItem(USERNAME_STORAGE_KEY, username);
     window.dispatchEvent(new Event(USERNAME_CHANGE_EVENT));
   }
 
