@@ -33,6 +33,7 @@ function handleRoundWaiting(event: RoundWaitingEvent) {
     multiplier: 1,
     crashPoint: null,
     myBet: null,
+    players: event.players ?? [],
     playerCount: getPlayerCount(event),
   });
 }
@@ -45,6 +46,7 @@ function handleRoundStart(event: RoundStartEvent) {
     endsAt: null,
     multiplier: 1,
     crashPoint: null,
+    players: event.players ?? [],
     playerCount: getPlayerCount(event),
   });
 }
@@ -84,6 +86,7 @@ function handleRoundCrash(event: RoundCrashEvent) {
     multiplier: event.crashPoint,
     crashPoint: event.crashPoint,
     crashFlash: true,
+    players: event.players ?? [],
     playerCount: getPlayerCount(event),
   });
 

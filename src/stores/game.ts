@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { RoundPhase, MyBet, RoundStateEvent } from "../types/type";
+import { RoundPhase, MyBet, PublicPlayer, RoundStateEvent } from "../types/type";
 
 function normalizeRoundPhase(phase: RoundStateEvent["phase"]): RoundPhase {
   if (phase === "running") {
@@ -28,6 +28,7 @@ type GameState = {
   crashPoint: number | null;
   crashFlash: boolean;
   myBet: MyBet | null;
+  players: PublicPlayer[];
   playerCount: number;
   isBetPending: boolean;
   betError: string | null;
@@ -49,6 +50,7 @@ export const useGameStore = create<GameState>((set) => ({
   crashPoint: null,
   crashFlash: false,
   myBet: null,
+  players: [],
   playerCount: 0,
   isBetPending: false,
   betError: null,
@@ -67,6 +69,7 @@ export const useGameStore = create<GameState>((set) => ({
       multiplier: event.currentMultiplier,
       crashPoint: event.crashPoint,
       myBet: event.yourBet,
+      players: event.players ?? [],
       playerCount: getPlayerCount(event),
       isBetPending: false,
       betError: null,
