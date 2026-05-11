@@ -20,6 +20,10 @@ function handleRoundState(event: RoundStateEvent) {
   useGameStore.getState().applyRoundState(event);
 }
 
+function getPlayerCount(event: { playerCount?: number; players?: unknown[] }) {
+  return event.players?.length ?? event.playerCount ?? 0;
+}
+
 function handleRoundWaiting(event: RoundWaitingEvent) {
   useGameStore.setState({
     phase: "waiting",
@@ -29,7 +33,7 @@ function handleRoundWaiting(event: RoundWaitingEvent) {
     multiplier: 1,
     crashPoint: null,
     myBet: null,
-    playerCount: event.playerCount,
+    playerCount: getPlayerCount(event),
   });
 }
 
@@ -41,7 +45,7 @@ function handleRoundStart(event: RoundStartEvent) {
     endsAt: null,
     multiplier: 1,
     crashPoint: null,
-    playerCount: event.playerCount,
+    playerCount: getPlayerCount(event),
   });
 }
 
@@ -55,6 +59,9 @@ function handleRoundTick(event: RoundTickEvent) {
   useGameStore.setState({
     phase: "tick",
     multiplier: event.multiplier,
+    ...(typeof event.playerCount === "number"
+      ? { playerCount: event.playerCount }
+      : null),
   });
 }
 
@@ -77,7 +84,7 @@ function handleRoundCrash(event: RoundCrashEvent) {
     multiplier: event.crashPoint,
     crashPoint: event.crashPoint,
     crashFlash: true,
-    playerCount: event.playerCount,
+    playerCount: getPlayerCount(event),
   });
 
   useRecentStore.getState().prepend({
@@ -98,10 +105,11 @@ function handleRoundCrash(event: RoundCrashEvent) {
 }
 
 function handleBetPlaced(event: BetPlacedEvent) {
-  console.log("bet:placed", event);
-
   useGameStore.setState({
     balance: event.balance,
+    ...(typeof event.playerCount === "number"
+      ? { playerCount: event.playerCount }
+      : null),
     isBetPending: false,
     betError: null,
     myBet: {
@@ -114,8 +122,6 @@ function handleBetPlaced(event: BetPlacedEvent) {
 }
 
 function handleBetCashedOut(event: BetCashedOutEvent) {
-  console.log("bet:cashedOut", event);
-
   useGameStore.setState({
     balance: event.balance,
     isBetPending: false,
@@ -125,8 +131,6 @@ function handleBetCashedOut(event: BetCashedOutEvent) {
 }
 
 function handleBetLost(event: BetLostEvent) {
-  console.log("bet:lost", event);
-
   useGameStore.setState({
     balance: event.balance,
     isBetPending: false,
@@ -135,8 +139,6 @@ function handleBetLost(event: BetLostEvent) {
 }
 
 function handleBetRejected(event: BetRejectedEvent) {
-  console.log("bet:rejected", event);
-
   useGameStore.setState({
     isBetPending: false,
     betError: event.message,

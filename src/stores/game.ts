@@ -13,6 +13,10 @@ function normalizeRoundPhase(phase: RoundStateEvent["phase"]): RoundPhase {
   return phase;
 }
 
+function getPlayerCount(event: { playerCount?: number; players?: unknown[] }) {
+  return event.players?.length ?? event.playerCount ?? 0;
+}
+
 type GameState = {
   balance: number | null;
 
@@ -63,7 +67,7 @@ export const useGameStore = create<GameState>((set) => ({
       multiplier: event.currentMultiplier,
       crashPoint: event.crashPoint,
       myBet: event.yourBet,
-      playerCount: event.playerCount,
+      playerCount: getPlayerCount(event),
       isBetPending: false,
       betError: null,
     }),

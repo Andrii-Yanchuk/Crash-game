@@ -1,12 +1,12 @@
 export type RoundPhase = "waiting" | "start" | "tick" | "crash";
 export type ServerRoundPhase = RoundPhase | "running" | "crashed";
-export type PlayerStatus = "placed" | "cashed_out" | "lost";
+export type PlayerStatus = "watching" | "placed" | "cashed_out" | "lost";
 
 export type PublicPlayer = {
   username: string;
   amount: number;
   status?: PlayerStatus;
-  multiplier?: number;
+  multiplier?: number | null;
 };
 
 export type MyBet = {
@@ -34,31 +34,36 @@ export interface RoundStateEvent {
     autoCashOutAt: number | null;
     status: PlayerStatus;
   } | null;
-  playerCount: number;
+  playerCount?: number;
+  players?: PublicPlayer[];
 }
 
 export interface RoundWaitingEvent {
   roundId: string;
   endsAt: string;
-  playerCount: number;
+  playerCount?: number;
+  players?: PublicPlayer[];
 }
 
 export interface RoundStartEvent {
   roundId: string;
   startedAt: string;
-  playerCount: number;
+  playerCount?: number;
+  players?: PublicPlayer[];
 }
 
 export interface RoundTickEvent {
   roundId: string;
   multiplier: number;
   elapsedMs: number;
+  playerCount?: number;
 }
 
 export interface RoundCrashEvent {
   roundId: string;
   crashPoint: number;
-  playerCount: number;
+  playerCount?: number;
+  players?: PublicPlayer[];
 }
 
 export interface BetPlacedEvent {
@@ -67,6 +72,7 @@ export interface BetPlacedEvent {
   amount: number;
   autoCashOutAt: number | null;
   balance: number;
+  playerCount?: number;
 }
 
 export interface BetCashedOutEvent {
