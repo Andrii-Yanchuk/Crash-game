@@ -39,7 +39,6 @@ interface ControlsProps {
 export function Controls({ username }: ControlsProps) {
   const [amount, setAmount] = useState(10);
   const [isAutoCashOutEnabled, setIsAutoCashOutEnabled] = useState(false);
-  const [autoCashOutAt, setAutoCashOutAt] = useState(2);
   const balance = useGameStore((state) => state.balance);
   const {
     error: balanceError,
@@ -116,20 +115,12 @@ export function Controls({ username }: ControlsProps) {
       return;
     }
 
-    if (
-      isAutoCashOutEnabled &&
-      (!Number.isFinite(autoCashOutAt) || autoCashOutAt < 1.01)
-    ) {
-      setBetError("Auto cash out must be at least 1.01x.");
-      return;
-    }
-
     setBetError(null);
     setIsBetPending(true);
     playBetSound();
     socket.emit("bet:place", {
       amount,
-      autoCashOutAt: isAutoCashOutEnabled ? autoCashOutAt : null,
+      autoCashOutAt: isAutoCashOutEnabled ? 2 : null,
     });
   }
 
@@ -173,39 +164,29 @@ export function Controls({ username }: ControlsProps) {
         <span className="text-xs font-semibold uppercase tracking-wide text-[#7A8599]">
           Auto cash out
         </span>
-        <button
-          type="button"
-          aria-label="Toggle auto cash out"
-          aria-pressed={isAutoCashOutEnabled}
-          onClick={() => setIsAutoCashOutEnabled((value) => !value)}
-          className={`flex h-6 w-11 items-center rounded-full p-0.5 cursor-pointer transition ${
-            isAutoCashOutEnabled ? "bg-[#FBBF24]" : "bg-[#111620]"
-          }`}
-        >
-          <span
-            className={`size-5 rounded-full bg-white transition ${
-              isAutoCashOutEnabled ? "translate-x-5" : ""
+        <div className="flex items-center gap-3">
+          {isAutoCashOutEnabled ? (
+            <span className="font-mono text-sm font-semibold text-[#FBBF24]">
+              2.00x
+            </span>
+          ) : null}
+          <button
+            type="button"
+            aria-label="Toggle auto cash out"
+            aria-pressed={isAutoCashOutEnabled}
+            onClick={() => setIsAutoCashOutEnabled((value) => !value)}
+            className={`flex h-6 w-11 items-center rounded-full p-0.5 cursor-pointer transition ${
+              isAutoCashOutEnabled ? "bg-[#FBBF24]" : "bg-[#111620]"
             }`}
-          />
-        </button>
-      </div>
-      {isAutoCashOutEnabled ? (
-        <div className="mb-5 flex h-10 items-center rounded-[9px] border border-[#1A1F2E] bg-[#111620] px-3">
-          <input
-            type="number"
-            min="1.01"
-            step="0.01"
-            value={autoCashOutAt}
-            onChange={(event) =>
-              setAutoCashOutAt(event.target.valueAsNumber || 0)
-            }
-            className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-          />
-          <span className="ml-3 shrink-0 text-sm font-medium text-[#7A8599]">
-            x
-          </span>
+          >
+            <span
+              className={`size-5 rounded-full bg-white transition ${
+                isAutoCashOutEnabled ? "translate-x-5" : ""
+              }`}
+            />
+          </button>
         </div>
-      ) : null}
+      </div>
 
       <button
         type="button"

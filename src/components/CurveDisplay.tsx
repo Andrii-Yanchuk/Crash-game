@@ -121,7 +121,7 @@ export function CurveDisplay() {
   }, [curvePoints, crashed, phase]);
 
   return (
-    <section className="relative flex min-h-90 flex-1 items-center justify-center overflow-hidden rounded-xl border border-[#1A1F2E] bg-[#0E1119] p-6">
+    <section className="relative flex h-full max-h-[1054px] min-h-90 w-full max-w-[1500px] flex-1 items-center justify-center overflow-hidden rounded-xl border border-[#1A1F2E] bg-[#0E1119] p-6">
       <div
         className="absolute inset-0 opacity-20"
         style={{

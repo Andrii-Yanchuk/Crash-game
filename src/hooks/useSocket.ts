@@ -187,6 +187,7 @@ function handlePlayerLost(event: PlayerLostEvent) {
 
 export function useSocket(username: string | null) {
   const isSoundEnabled = useGameStore((state) => state.isSoundEnabled);
+  const setIsConnected = useGameStore((state) => state.setIsConnected);
   const [playWinSound] = useSound("/sounds/win.mp3", {
     soundEnabled: isSoundEnabled,
     volume: 0.7,
@@ -198,6 +199,7 @@ export function useSocket(username: string | null) {
 
   useEffect(() => {
     if (!username) {
+      setIsConnected(false);
       socket.disconnect();
       return;
     }
@@ -205,6 +207,18 @@ export function useSocket(username: string | null) {
     socket.auth = {
       apiKey: username,
     };
+
+    function handleConnect() {
+      setIsConnected(true);
+    }
+
+    function handleDisconnect() {
+      setIsConnected(false);
+    }
+
+    setIsConnected(socket.connected);
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
 
     function handleRoundCrashWithSound(event: RoundCrashEvent) {
       handleRoundCrash(event);
@@ -245,11 +259,14 @@ export function useSocket(username: string | null) {
       socket.off("players:bet", handlePlayerBet);
       socket.off("players:cashout", handlePlayerCashout);
       socket.off("players:lost", handlePlayerLost);
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
       if (crashFlashTimeout) {
         clearTimeout(crashFlashTimeout);
         crashFlashTimeout = null;
       }
+      setIsConnected(false);
       socket.disconnect();
     };
-  }, [playLoseSound, playWinSound, username]);
+  }, [playLoseSound, playWinSound, setIsConnected, username]);
 }

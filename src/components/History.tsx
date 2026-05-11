@@ -10,19 +10,18 @@ const TIER_CLASSES = {
 
 export function History() {
   const rounds = useRecentStore((state) => state.rounds);
+  const visibleRounds = rounds.slice(0, 15);
 
   return (
-    <section className="flex h-10 items-center gap-2 overflow-hidden rounded-lg border border-[#1A1F2E] bg-[#0E1119] px-3">
-      <div className="scrollbar-none flex min-w-0 flex-1 gap-2 overflow-x-auto overflow-y-hidden">
-        {rounds.map((round) => (
-          <span
-            key={round.roundId}
-            className={`shrink-0 rounded-[40px] border px-2 py-0.5 text-xs font-semibold ${TIER_CLASSES[round.tier]}`}
-          >
-            {round.crashPoint.toFixed(2)}x
-          </span>
-        ))}
-      </div>
+    <section className="scrollbar-none flex h-10 w-full max-w-[1500px] min-w-0 items-center gap-2 overflow-x-auto overflow-y-hidden">
+      {visibleRounds.map((round) => (
+        <span
+          key={round.roundId}
+          className={`shrink-0 rounded-[40px] border px-2 py-0.5 text-xs font-semibold ${TIER_CLASSES[round.tier]}`}
+        >
+          {round.crashPoint.toFixed(2)}x
+        </span>
+      ))}
     </section>
   );
 }

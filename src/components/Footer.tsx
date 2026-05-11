@@ -17,8 +17,11 @@ export function Footer({ username, onLogout }: FooterProps) {
   const players = useGameStore((state) => state.players);
   const playerCount = useGameStore((state) => state.playerCount);
   const isSoundEnabled = useGameStore((state) => state.isSoundEnabled);
+  const isConnected = useGameStore((state) => state.isConnected);
   const setIsSoundEnabled = useGameStore((state) => state.setIsSoundEnabled);
   const displayedRoundId = roundId?.replace("round_", "R#") ?? "R#----";
+  const connectionLabel = isConnected ? "Connected" : "Disconnected";
+  const connectionDotClassName = isConnected ? "bg-[#22C55E]" : "bg-[#EF4444]";
 
   function closePlayersPanel() {
     playersButtonRef.current?.focus();
@@ -29,9 +32,29 @@ export function Footer({ username, onLogout }: FooterProps) {
     <>
       <footer className="flex h-18 items-center justify-between border-t border-[#1A1F2E] bg-[#0B0E16] px-4 text-[#7A8599]">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <span className="size-2.5 shrink-0 rounded-full bg-[#22C55E]" />
+          <div className="flex items-center gap-2 text-sm font-medium md:hidden">
+            <span
+              className={`size-2.5 shrink-0 rounded-full ${connectionDotClassName}`}
+            />
             <span>{displayedRoundId}</span>
+          </div>
+
+          <div className="hidden min-w-0 items-center gap-2 text-sm font-medium md:flex">
+            <span
+              className={`size-3 shrink-0 rounded-full ${connectionDotClassName}`}
+            />
+            <span className="shrink-0">{connectionLabel}</span>
+            <span className="text-[#4A5568]">•</span>
+            <span className="shrink-0">Round {displayedRoundId}</span>
+            <Image
+              src="/wifi-icon.svg"
+              alt=""
+              aria-hidden="true"
+              width={16}
+              height={16}
+              className="ml-3 shrink-0"
+            />
+            <span className="shrink-0">{playerCount} players</span>
           </div>
 
           <button
@@ -39,7 +62,7 @@ export function Footer({ username, onLogout }: FooterProps) {
             type="button"
             aria-label="Open live players"
             onClick={() => setIsPlayersPanelOpen(true)}
-            className="flex h-11 items-center gap-2 rounded-full bg-[#101621] px-4 text-white transition hover:bg-[#171E2B] cursor-pointer"
+            className="flex h-11 items-center gap-2 rounded-full bg-[#101621] px-4 text-white transition hover:bg-[#171E2B] cursor-pointer md:hidden"
           >
             <Image
               src="/players-icon.svg"

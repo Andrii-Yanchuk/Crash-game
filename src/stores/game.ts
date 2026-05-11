@@ -33,12 +33,14 @@ type GameState = {
   isBetPending: boolean;
   betError: string | null;
   isSoundEnabled: boolean;
+  isConnected: boolean;
 
   setBalance: (balance: number) => void;
   setIsBetPending: (isBetPending: boolean) => void;
   setBetError: (betError: string | null) => void;
   clearBetError: () => void;
   setIsSoundEnabled: (isSoundEnabled: boolean) => void;
+  setIsConnected: (isConnected: boolean) => void;
   upsertPlayer: (player: PublicPlayer) => void;
   applyRoundState: (event: RoundStateEvent) => void;
 };
@@ -58,12 +60,14 @@ export const useGameStore = create<GameState>((set) => ({
   isBetPending: false,
   betError: null,
   isSoundEnabled: true,
+  isConnected: false,
 
   setBalance: (balance) => set({ balance }),
   setIsBetPending: (isBetPending) => set({ isBetPending }),
   setBetError: (betError) => set({ betError }),
   clearBetError: () => set({ betError: null }),
   setIsSoundEnabled: (isSoundEnabled) => set({ isSoundEnabled }),
+  setIsConnected: (isConnected) => set({ isConnected }),
   upsertPlayer: (player) =>
     set((state) => {
       const playerIndex = state.players.findIndex(
