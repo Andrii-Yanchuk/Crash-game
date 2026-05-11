@@ -11,12 +11,13 @@ interface FooterProps {
 }
 
 export function Footer({ username, onLogout }: FooterProps) {
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [isPlayersPanelOpen, setIsPlayersPanelOpen] = useState(false);
   const playersButtonRef = useRef<HTMLButtonElement>(null);
   const roundId = useGameStore((state) => state.roundId);
   const players = useGameStore((state) => state.players);
   const playerCount = useGameStore((state) => state.playerCount);
+  const isSoundEnabled = useGameStore((state) => state.isSoundEnabled);
+  const setIsSoundEnabled = useGameStore((state) => state.setIsSoundEnabled);
   const displayedRoundId = roundId?.replace("round_", "R#") ?? "R#----";
 
   function closePlayersPanel() {
@@ -74,7 +75,7 @@ export function Footer({ username, onLogout }: FooterProps) {
             type="button"
             aria-label={isSoundEnabled ? "Disable sound" : "Enable sound"}
             aria-pressed={isSoundEnabled}
-            onClick={() => setIsSoundEnabled((value) => !value)}
+            onClick={() => setIsSoundEnabled(!isSoundEnabled)}
             className={`flex size-10 items-center justify-center rounded-full transition cursor-pointer ${
               isSoundEnabled
                 ? "text-[#7A8599] hover:bg-[#101621] hover:text-white"

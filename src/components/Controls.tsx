@@ -5,6 +5,7 @@ import { socket } from "@/lib/socket";
 import { useGameStore } from "@/stores/game";
 import Image from "next/image";
 import { useState } from "react";
+import useSound from "use-sound";
 
 const QUICK_ACTIONS = ["1/2", "x2", "Max"];
 
@@ -49,8 +50,13 @@ export function Controls({ username }: ControlsProps) {
   const myBet = useGameStore((state) => state.myBet);
   const isBetPending = useGameStore((state) => state.isBetPending);
   const betError = useGameStore((state) => state.betError);
+  const isSoundEnabled = useGameStore((state) => state.isSoundEnabled);
   const setIsBetPending = useGameStore((state) => state.setIsBetPending);
   const setBetError = useGameStore((state) => state.setBetError);
+  const [playBetSound] = useSound("/sounds/bet.mp3", {
+    soundEnabled: isSoundEnabled,
+    volume: 0.6,
+  });
   const betButtonState = BET_BUTTON_STATE[phase];
   const hasPlacedBet = phase === "waiting" && Boolean(myBet);
   const canCashOut = phase === "tick" && Boolean(myBet);
@@ -120,6 +126,7 @@ export function Controls({ username }: ControlsProps) {
 
     setBetError(null);
     setIsBetPending(true);
+    playBetSound();
     socket.emit("bet:place", {
       amount,
       autoCashOutAt: isAutoCashOutEnabled ? autoCashOutAt : null,

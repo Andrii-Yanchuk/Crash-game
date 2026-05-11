@@ -16,6 +16,7 @@ import {
   RoundWaitingEvent,
 } from "@/types/type";
 import { useEffect } from "react";
+import useSound from "use-sound";
 
 let crashFlashTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -58,7 +59,7 @@ function handleRoundTick(event: RoundTickEvent) {
   const currentRoundId = useGameStore.getState().roundId;
 
   if (event.roundId !== currentRoundId) {
-    return;
+    return false;
   }
 
   useGameStore.setState({
@@ -68,6 +69,8 @@ function handleRoundTick(event: RoundTickEvent) {
       ? { playerCount: event.playerCount }
       : null),
   });
+
+  return true;
 }
 
 function getCrashTier(crashPoint: number) {
@@ -183,6 +186,16 @@ function handlePlayerLost(event: PlayerLostEvent) {
 }
 
 export function useSocket(username: string | null) {
+  const isSoundEnabled = useGameStore((state) => state.isSoundEnabled);
+  const [playWinSound] = useSound("/sounds/win.mp3", {
+    soundEnabled: isSoundEnabled,
+    volume: 0.7,
+  });
+  const [playLoseSound] = useSound("/sounds/lose.mp3", {
+    soundEnabled: isSoundEnabled,
+    volume: 0.7,
+  });
+
   useEffect(() => {
     if (!username) {
       socket.disconnect();
@@ -193,13 +206,24 @@ export function useSocket(username: string | null) {
       apiKey: username,
     };
 
+    function handleRoundCrashWithSound(event: RoundCrashEvent) {
+      handleRoundCrash(event);
+      playLoseSound();
+    }
+
+    function handleBetCashedOutWithSound(event: BetCashedOutEvent) {
+      handleBetCashedOut(event);
+      playWinSound();
+    }
+
     socket.on("round:state", handleRoundState);
     socket.on("round:waiting", handleRoundWaiting);
     socket.on("round:start", handleRoundStart);
     socket.on("round:tick", handleRoundTick);
-    socket.on("round:crash", handleRoundCrash);
+    socket.on("round:crash", handleRoundCrashWithSound);
     socket.on("bet:placed", handleBetPlaced);
-    socket.on("bet:cashedOut", handleBetCashedOut);
+    socket.on("bet:cashout", handleBetCashedOutWithSound);
+    socket.on("bet:cashedOut", handleBetCashedOutWithSound);
     socket.on("bet:lost", handleBetLost);
     socket.on("bet:rejected", handleBetRejected);
     socket.on("players:bet", handlePlayerBet);
@@ -212,9 +236,10 @@ export function useSocket(username: string | null) {
       socket.off("round:waiting", handleRoundWaiting);
       socket.off("round:start", handleRoundStart);
       socket.off("round:tick", handleRoundTick);
-      socket.off("round:crash", handleRoundCrash);
+      socket.off("round:crash", handleRoundCrashWithSound);
       socket.off("bet:placed", handleBetPlaced);
-      socket.off("bet:cashedOut", handleBetCashedOut);
+      socket.off("bet:cashout", handleBetCashedOutWithSound);
+      socket.off("bet:cashedOut", handleBetCashedOutWithSound);
       socket.off("bet:lost", handleBetLost);
       socket.off("bet:rejected", handleBetRejected);
       socket.off("players:bet", handlePlayerBet);
@@ -226,5 +251,5 @@ export function useSocket(username: string | null) {
       }
       socket.disconnect();
     };
-  }, [username]);
+  }, [playLoseSound, playWinSound, username]);
 }
