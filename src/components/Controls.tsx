@@ -203,7 +203,7 @@ export function Controls({ username }: ControlsProps) {
       <button
         type="button"
         onClick={handleBetButtonClick}
-        className={`mb-4 h-[52px] rounded-[9px] font-semibold cursor-pointer transition disabled:cursor-not-allowed ${displayedBetButtonState.className}`}
+        className={`mb-4 h-13 rounded-[9px] font-semibold cursor-pointer transition disabled:cursor-not-allowed ${displayedBetButtonState.className}`}
         disabled={isBetButtonDisabled}
       >
         {betButtonLabel}
