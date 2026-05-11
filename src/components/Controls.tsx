@@ -68,6 +68,8 @@ export function Controls({ username }: ControlsProps) {
     isBetPending ||
     hasPlacedBet ||
     isWaitingForNextRound;
+  const isBetControlsDisabled =
+    isBetPending || Boolean(myBet) || phase !== "waiting";
   const betButtonLabel = isBetPending
     ? "Loading..."
     : canCashOut
@@ -79,6 +81,10 @@ export function Controls({ username }: ControlsProps) {
           : displayedBetButtonState.label;
 
   function handleQuickAction(action: string) {
+    if (isBetControlsDisabled) {
+      return;
+    }
+
     if (action === "1/2") {
       setAmount(amount / 2);
       return;
@@ -140,7 +146,8 @@ export function Controls({ username }: ControlsProps) {
           min="0"
           value={amount}
           onChange={(event) => setAmount(event.target.valueAsNumber || 0)}
-          className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          disabled={isBetControlsDisabled}
+          className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none disabled:cursor-not-allowed disabled:text-[#7A8599] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
         <span className="ml-3 shrink-0 text-sm font-medium text-[#7A8599]">
           USD
@@ -152,8 +159,9 @@ export function Controls({ username }: ControlsProps) {
           <button
             key={action}
             type="button"
+            disabled={isBetControlsDisabled}
             onClick={() => handleQuickAction(action)}
-            className="h-6 rounded-md border border-[#1A1F2E] bg-[#111620] text-xs font-medium text-[#7A8599] transition hover:bg-[#1A1F2E] cursor-pointer"
+            className="h-6 rounded-md border border-[#1A1F2E] bg-[#111620] text-xs font-medium text-[#7A8599] transition hover:bg-[#1A1F2E] cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#111620]"
           >
             {action}
           </button>
@@ -174,8 +182,9 @@ export function Controls({ username }: ControlsProps) {
             type="button"
             aria-label="Toggle auto cash out"
             aria-pressed={isAutoCashOutEnabled}
+            disabled={isBetControlsDisabled}
             onClick={() => setIsAutoCashOutEnabled((value) => !value)}
-            className={`flex h-6 w-11 items-center rounded-full p-0.5 cursor-pointer transition ${
+            className={`flex h-6 w-11 items-center rounded-full p-0.5 cursor-pointer transition disabled:cursor-not-allowed disabled:opacity-50 ${
               isAutoCashOutEnabled ? "bg-[#FBBF24]" : "bg-[#111620]"
             }`}
           >
