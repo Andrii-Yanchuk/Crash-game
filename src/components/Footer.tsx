@@ -2,7 +2,7 @@
 
 import { useGameStore } from "@/stores/game";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { PlayersPanel } from "./PlayersPanel";
 
 interface FooterProps {
@@ -13,10 +13,16 @@ interface FooterProps {
 export function Footer({ username, onLogout }: FooterProps) {
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [isPlayersPanelOpen, setIsPlayersPanelOpen] = useState(false);
+  const playersButtonRef = useRef<HTMLButtonElement>(null);
   const roundId = useGameStore((state) => state.roundId);
   const players = useGameStore((state) => state.players);
   const playerCount = useGameStore((state) => state.playerCount);
   const displayedRoundId = roundId?.replace("round_", "R#") ?? "R#----";
+
+  function closePlayersPanel() {
+    playersButtonRef.current?.focus();
+    setIsPlayersPanelOpen(false);
+  }
 
   return (
     <>
@@ -28,6 +34,7 @@ export function Footer({ username, onLogout }: FooterProps) {
           </div>
 
           <button
+            ref={playersButtonRef}
             type="button"
             aria-label="Open live players"
             onClick={() => setIsPlayersPanelOpen(true)}
@@ -88,7 +95,7 @@ export function Footer({ username, onLogout }: FooterProps) {
       <PlayersPanel
         isOpen={isPlayersPanelOpen}
         players={players}
-        onClose={() => setIsPlayersPanelOpen(false)}
+        onClose={closePlayersPanel}
       />
     </>
   );

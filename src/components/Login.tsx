@@ -46,7 +46,6 @@ export function Login({ onLogin }: LoginProps) {
           placeholder="Enter your username"
           aria-invalid={isUsernameInvalid}
           autoComplete="username"
-          pattern="[A-Za-z0-9_-]{3,}"
           className="bg-[#111620] border border-[#1A1F2E] text-white px-4 py-2 mb-2 rounded focus:outline-none focus:ring-2 focus:ring-[#FBBF24] transition"
         />
         <span className="text-[#7A8599] text-xs mb-6">

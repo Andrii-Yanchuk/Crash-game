@@ -46,7 +46,6 @@ export function PlayersPanel({ isOpen, players, onClose }: PlayersPanelProps) {
         className={`fixed right-0 top-0 z-40 flex h-dvh w-62.5 max-w-[85vw] flex-col border-l border-[#1A1F2E] bg-[#0B0E16] text-white shadow-2xl transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
-        aria-hidden={!isOpen}
       >
         <div className="flex h-12 items-center justify-between border-b border-[#1A1F2E] px-4">
           <div className="flex min-w-0 items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[#7A8599]">
