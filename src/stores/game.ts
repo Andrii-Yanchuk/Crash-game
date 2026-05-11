@@ -37,6 +37,7 @@ type GameState = {
   setIsBetPending: (isBetPending: boolean) => void;
   setBetError: (betError: string | null) => void;
   clearBetError: () => void;
+  upsertPlayer: (player: PublicPlayer) => void;
   applyRoundState: (event: RoundStateEvent) => void;
 };
 
@@ -59,6 +60,23 @@ export const useGameStore = create<GameState>((set) => ({
   setIsBetPending: (isBetPending) => set({ isBetPending }),
   setBetError: (betError) => set({ betError }),
   clearBetError: () => set({ betError: null }),
+  upsertPlayer: (player) =>
+    set((state) => {
+      const playerIndex = state.players.findIndex(
+        (item) => item.username === player.username,
+      );
+      const players =
+        playerIndex === -1
+          ? [...state.players, player]
+          : state.players.map((item, index) =>
+              index === playerIndex ? { ...item, ...player } : item,
+            );
+
+      return {
+        players,
+        playerCount: players.length,
+      };
+    }),
 
   applyRoundState: (event) =>
     set({

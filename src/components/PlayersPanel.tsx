@@ -27,7 +27,27 @@ function getPlayerLabel(player: PublicPlayer) {
     return "Lost";
   }
 
+  if (player.status === "watching") {
+    return "Watching";
+  }
+
   return "Bet";
+}
+
+function getPlayerStatusClassName(player: PublicPlayer) {
+  if (player.status === "cashed_out") {
+    return "text-[#22C55E]";
+  }
+
+  if (player.status === "lost") {
+    return "text-[#EF4444]";
+  }
+
+  if (player.status === "watching") {
+    return "text-[#7A8599]";
+  }
+
+  return "text-[#FBBF24]";
 }
 
 export function PlayersPanel({ isOpen, players, onClose }: PlayersPanelProps) {
@@ -92,7 +112,11 @@ export function PlayersPanel({ isOpen, players, onClose }: PlayersPanelProps) {
                 </p>
               </div>
 
-              <span className="shrink-0 text-xs font-medium text-[#FBBF24]">
+              <span
+                className={`shrink-0 text-xs font-medium ${getPlayerStatusClassName(
+                  player,
+                )}`}
+              >
                 {getPlayerLabel(player)}
               </span>
             </div>

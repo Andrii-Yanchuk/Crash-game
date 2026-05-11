@@ -6,6 +6,9 @@ import {
   BetLostEvent,
   BetPlacedEvent,
   BetRejectedEvent,
+  PlayerBetEvent,
+  PlayerCashoutEvent,
+  PlayerLostEvent,
   RoundCrashEvent,
   RoundStartEvent,
   RoundStateEvent,
@@ -148,6 +151,37 @@ function handleBetRejected(event: BetRejectedEvent) {
   });
 }
 
+function handlePlayerBet(event: PlayerBetEvent) {
+  useGameStore.getState().upsertPlayer({
+    username: event.username,
+    amount: event.amount,
+    status: "placed",
+    multiplier: null,
+  });
+}
+
+function handlePlayerCashout(event: PlayerCashoutEvent) {
+  const currentPlayer = useGameStore
+    .getState()
+    .players.find((player) => player.username === event.username);
+
+  useGameStore.getState().upsertPlayer({
+    username: event.username,
+    amount: currentPlayer?.amount ?? event.winAmount,
+    status: "cashed_out",
+    multiplier: event.multiplier,
+  });
+}
+
+function handlePlayerLost(event: PlayerLostEvent) {
+  useGameStore.getState().upsertPlayer({
+    username: event.username,
+    amount: event.amount,
+    status: "lost",
+    multiplier: null,
+  });
+}
+
 export function useSocket(username: string | null) {
   useEffect(() => {
     if (!username) {
@@ -168,6 +202,9 @@ export function useSocket(username: string | null) {
     socket.on("bet:cashedOut", handleBetCashedOut);
     socket.on("bet:lost", handleBetLost);
     socket.on("bet:rejected", handleBetRejected);
+    socket.on("players:bet", handlePlayerBet);
+    socket.on("players:cashout", handlePlayerCashout);
+    socket.on("players:lost", handlePlayerLost);
     socket.connect();
 
     return () => {
@@ -180,6 +217,9 @@ export function useSocket(username: string | null) {
       socket.off("bet:cashedOut", handleBetCashedOut);
       socket.off("bet:lost", handleBetLost);
       socket.off("bet:rejected", handleBetRejected);
+      socket.off("players:bet", handlePlayerBet);
+      socket.off("players:cashout", handlePlayerCashout);
+      socket.off("players:lost", handlePlayerLost);
       if (crashFlashTimeout) {
         clearTimeout(crashFlashTimeout);
         crashFlashTimeout = null;

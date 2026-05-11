@@ -89,6 +89,22 @@ export interface BetLostEvent {
   balance: number;
 }
 
+export interface PlayerBetEvent {
+  username: string;
+  amount: number;
+}
+
+export interface PlayerCashoutEvent {
+  username: string;
+  multiplier: number;
+  winAmount: number;
+}
+
+export interface PlayerLostEvent {
+  username: string;
+  amount: number;
+}
+
 export type BetRejectedReason =
   | "betting_closed"
   | "already_has_bet"
