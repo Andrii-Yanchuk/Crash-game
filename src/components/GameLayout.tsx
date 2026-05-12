@@ -1,8 +1,9 @@
 "use client";
 
-import { Controls } from "./Controls";
+import { Controls } from "./controls/Controls";
 import { History } from "./History";
 import { Footer } from "./Footer";
+import { useBalance } from "@/hooks/useBalance";
 import { useRecentRounds } from "@/hooks/useRecentRounds";
 import { CurveDisplay } from "./CurveDisplay";
 import { PlayersList } from "./PlayersPanel";
@@ -15,6 +16,11 @@ interface GameLayoutProps {
 
 export function GameLayout({ username, onLogout }: GameLayoutProps) {
   useRecentRounds(username);
+  const {
+    error: balanceError,
+    isLoading: isBalanceLoading,
+    isError: isBalanceError,
+  } = useBalance(username);
   const players = useGameStore((state) => state.players);
 
   return (
@@ -28,7 +34,11 @@ export function GameLayout({ username, onLogout }: GameLayoutProps) {
         </div>
         <div className="grid min-w-0 gap-3 md:grid-cols-2 lg:contents">
           <div className="lg:col-start-1 lg:row-span-2 lg:row-start-1">
-            <Controls username={username} />
+            <Controls
+              balanceErrorMessage={balanceError?.message}
+              isBalanceError={isBalanceError}
+              isBalanceLoading={isBalanceLoading}
+            />
           </div>
           <div className="hidden min-h-80 md:block lg:col-start-3 lg:row-span-2 lg:row-start-1">
             <PlayersList players={players} className="h-full" />

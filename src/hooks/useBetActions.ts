@@ -1,0 +1,67 @@
+import { MAX_BET_AMOUNT } from "@/config/bet";
+import { socket } from "@/lib/socket";
+import { useGameStore } from "@/stores/game";
+import useSound from "use-sound";
+
+export type PlaceBetInput = {
+  amount: number;
+  autoCashOutAt: number | null;
+};
+
+function validateBetAmount(amount: number) {
+  if (!Number.isFinite(amount) || amount <= 0 || amount > MAX_BET_AMOUNT) {
+    return `Bet amount must be greater than 0 and no more than ${MAX_BET_AMOUNT}.`;
+  }
+
+  return null;
+}
+
+export function useBetActions() {
+  const isSoundEnabled = useGameStore((state) => state.isSoundEnabled);
+  const [playBetSound] = useSound("/sounds/bet.mp3", {
+    soundEnabled: isSoundEnabled,
+    volume: 0.6,
+  });
+
+  function cashOut() {
+    const { phase, myBet, isBetPending, setBetError, setIsBetPending } =
+      useGameStore.getState();
+
+    if (phase !== "tick" || !myBet || isBetPending) {
+      return;
+    }
+
+    setBetError(null);
+    setIsBetPending(true);
+    socket.emit("bet:cashout", {});
+  }
+
+  function placeBet({ amount, autoCashOutAt }: PlaceBetInput) {
+    const { phase, myBet, isBetPending, setBetError, setIsBetPending } =
+      useGameStore.getState();
+
+    if (phase !== "waiting" || myBet || isBetPending) {
+      return;
+    }
+
+    const validationError = validateBetAmount(amount);
+
+    if (validationError) {
+      setBetError(validationError);
+      return;
+    }
+
+    setBetError(null);
+    setIsBetPending(true);
+    playBetSound();
+    socket.emit("bet:place", {
+      amount,
+      autoCashOutAt,
+    });
+  }
+
+  return {
+    cashOut,
+    placeBet,
+  };
+}
