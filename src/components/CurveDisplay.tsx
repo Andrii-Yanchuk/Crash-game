@@ -1,7 +1,8 @@
 "use client";
 
 import { useGameStore } from "@/stores/game";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMultiplierStore } from "@/stores/multiplier";
+import { memo, useEffect, useRef, useState } from "react";
 
 const CURVE_POINTS_COUNT = 80;
 const COUNTDOWN_SERVER_DRIFT_MS = 4000;
@@ -18,14 +19,93 @@ function getPhaseColor(phase: string, crashed: boolean) {
   return "#22C55E";
 }
 
-export function CurveDisplay() {
+function getCurvePoints(multiplier: number) {
+  return Array.from({ length: CURVE_POINTS_COUNT }, (_, index) => {
+    const progress = index / (CURVE_POINTS_COUNT - 1);
+    const x = progress * 10;
+    const y = 1 + (multiplier - 1) * progress ** 2;
+
+    return { x, y };
+  });
+}
+
+function drawCurve(
+  canvas: HTMLCanvasElement,
+  multiplier: number,
+  phase: string,
+  crashed: boolean,
+) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    return;
+  }
+
+  const width = canvas.width;
+  const height = canvas.height;
+
+  ctx.clearRect(0, 0, width, height);
+
+  if (phase === "waiting" || phase === "start") {
+    return;
+  }
+
+  const curvePoints = getCurvePoints(multiplier);
+  const maxX = Math.max(...curvePoints.map((point) => point.x));
+  const maxY = Math.max(...curvePoints.map((point) => point.y));
+  const scaleX = (width - 40) / Math.max(maxX, 1);
+  const scaleY = (height - 40) / Math.max(maxY, 1.5);
+
+  ctx.strokeStyle = crashed ? "#EF4444" : "#22C55E";
+  ctx.lineWidth = 3;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+
+  ctx.beginPath();
+  curvePoints.forEach((point, index) => {
+    const x = 20 + point.x * scaleX;
+    const y = height - 20 - point.y * scaleY;
+
+    if (index === 0) {
+      ctx.moveTo(x, y);
+      return;
+    }
+
+    ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = crashed
+    ? "rgba(239, 68, 68, 0.15)"
+    : "rgba(34, 197, 94, 0.15)";
+  ctx.beginPath();
+  curvePoints.forEach((point, index) => {
+    const x = 20 + point.x * scaleX;
+    const y = height - 20 - point.y * scaleY;
+
+    if (index === 0) {
+      ctx.moveTo(x, y);
+      return;
+    }
+
+    ctx.lineTo(x, y);
+  });
+  ctx.lineTo(20 + maxX * scaleX, height - 20);
+  ctx.lineTo(20, height - 20);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function CurveDisplayComponent() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const multiplierTextRef = useRef<HTMLDivElement>(null);
+  const phaseRef = useRef("waiting");
+  const crashedRef = useRef(false);
   const phase = useGameStore((state) => state.phase);
   const endsAt = useGameStore((state) => state.endsAt);
-  const currentMultiplier = useGameStore((state) => state.multiplier);
   const [now, setNow] = useState(() => Date.now());
   const crashed = phase === "crash";
   const phaseColor = getPhaseColor(phase, crashed);
+  const initialMultiplier = useMultiplierStore.getState().multiplier;
   const countdownSeconds =
     phase === "waiting" && endsAt
       ? Math.max(
@@ -35,93 +115,55 @@ export function CurveDisplay() {
           ),
         )
       : 0;
-  const curvePoints = useMemo(
-    () =>
-      Array.from({ length: CURVE_POINTS_COUNT }, (_, index) => {
-        const progress = index / (CURVE_POINTS_COUNT - 1);
-        const x = progress * 10;
-        const y = 1 + (currentMultiplier - 1) * progress ** 2;
-
-        return { x, y };
-      }),
-    [currentMultiplier],
-  );
 
   useEffect(() => {
+    if (phase !== "waiting" || !endsAt) {
+      return;
+    }
+
     const intervalId = window.setInterval(() => {
       setNow(Date.now());
     }, 250);
 
     return () => window.clearInterval(intervalId);
-  }, []);
+  }, [endsAt, phase]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      return;
+    phaseRef.current = phase;
+    crashedRef.current = crashed;
+
+    const multiplier = useMultiplierStore.getState().multiplier;
+
+    if (multiplierTextRef.current) {
+      multiplierTextRef.current.textContent = `${multiplier.toFixed(2)}x`;
     }
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      return;
+    if (canvasRef.current) {
+      drawCurve(canvasRef.current, multiplier, phase, crashed);
     }
+  }, [crashed, phase]);
 
-    const width = canvas.width;
-    const height = canvas.height;
+  useEffect(() => {
+    return useMultiplierStore.subscribe((state) => {
+      const multiplier = state.multiplier;
 
-    ctx.clearRect(0, 0, width, height);
-
-    if (phase === "waiting" || phase === "start") {
-      return;
-    }
-
-    const maxX = Math.max(...curvePoints.map((point) => point.x));
-    const maxY = Math.max(...curvePoints.map((point) => point.y));
-    const scaleX = (width - 40) / Math.max(maxX, 1);
-    const scaleY = (height - 40) / Math.max(maxY, 1.5);
-
-    ctx.strokeStyle = crashed ? "#EF4444" : "#22C55E";
-    ctx.lineWidth = 3;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-
-    ctx.beginPath();
-    curvePoints.forEach((point, index) => {
-      const x = 20 + point.x * scaleX;
-      const y = height - 20 - point.y * scaleY;
-
-      if (index === 0) {
-        ctx.moveTo(x, y);
-        return;
+      if (multiplierTextRef.current) {
+        multiplierTextRef.current.textContent = `${multiplier.toFixed(2)}x`;
       }
 
-      ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    ctx.fillStyle = crashed
-      ? "rgba(239, 68, 68, 0.15)"
-      : "rgba(34, 197, 94, 0.15)";
-    ctx.beginPath();
-    curvePoints.forEach((point, index) => {
-      const x = 20 + point.x * scaleX;
-      const y = height - 20 - point.y * scaleY;
-
-      if (index === 0) {
-        ctx.moveTo(x, y);
-        return;
+      if (canvasRef.current) {
+        drawCurve(
+          canvasRef.current,
+          multiplier,
+          phaseRef.current,
+          crashedRef.current,
+        );
       }
-
-      ctx.lineTo(x, y);
     });
-    ctx.lineTo(20 + maxX * scaleX, height - 20);
-    ctx.lineTo(20, height - 20);
-    ctx.closePath();
-    ctx.fill();
-  }, [curvePoints, crashed, phase]);
+  }, []);
 
   return (
-    <section className="relative flex h-full max-h-[1054px] min-h-90 w-full max-w-[1500px] flex-1 items-center justify-center overflow-hidden rounded-xl border border-[#1A1F2E] bg-[#0E1119] p-6">
+    <section className="relative flex h-full max-h-263.5 min-h-90 w-full max-w-375 flex-1 items-center justify-center overflow-hidden rounded-xl border border-[#1A1F2E] bg-[#0E1119] p-6">
       <div
         className="absolute inset-0 opacity-20"
         style={{
@@ -158,6 +200,7 @@ export function CurveDisplay() {
           />
           <div className="relative z-10 text-center">
             <div
+              ref={multiplierTextRef}
               className={`font-mono text-8xl tracking-tighter transition-all ${
                 crashed ? "animate-pulse" : ""
               }`}
@@ -166,7 +209,7 @@ export function CurveDisplay() {
                 textShadow: `0 0 30px ${phaseColor}`,
               }}
             >
-              {currentMultiplier.toFixed(2)}x
+              {initialMultiplier.toFixed(2)}x
             </div>
             {crashed ? (
               <div className="mt-4 text-2xl text-[#EF4444] animate-pulse">
@@ -179,3 +222,5 @@ export function CurveDisplay() {
     </section>
   );
 }
+
+export const CurveDisplay = memo(CurveDisplayComponent);

@@ -1,4 +1,5 @@
 import { useGameStore } from "@/stores/game";
+import { useMultiplierStore } from "@/stores/multiplier";
 import { useRecentStore } from "@/stores/recent";
 import {
   RoundCrashEvent,
@@ -36,6 +37,7 @@ export function clearCrashFlashTimeout() {
 }
 
 export function handleRoundState(event: RoundStateEvent) {
+  useMultiplierStore.getState().setMultiplier(event.currentMultiplier);
   useGameStore.getState().applyRoundState(event);
 }
 
@@ -54,6 +56,7 @@ export function handleRoundWaiting(event: RoundWaitingEvent) {
     players: event.players ?? [],
     playerCount: getPlayerCount(event),
   });
+  useMultiplierStore.getState().setMultiplier(1);
 }
 
 export function handleRoundStart(event: RoundStartEvent) {
@@ -68,6 +71,7 @@ export function handleRoundStart(event: RoundStartEvent) {
     players: event.players ?? [],
     playerCount: getPlayerCount(event),
   });
+  useMultiplierStore.getState().setMultiplier(1);
 }
 
 export function handleRoundTick(event: RoundTickEvent) {
@@ -77,16 +81,32 @@ export function handleRoundTick(event: RoundTickEvent) {
     return;
   }
 
-  useGameStore.setState({
-    phase: "tick",
-    multiplier: event.multiplier,
-    ...(typeof event.playerCount === "number"
-      ? { playerCount: event.playerCount }
-      : null),
+  useMultiplierStore.getState().setMultiplier(event.multiplier);
+
+  useGameStore.setState((state) => {
+    const nextPhase = state.phase === "tick" ? state.phase : "tick";
+    const nextPlayerCount =
+      typeof event.playerCount === "number"
+        ? event.playerCount
+        : state.playerCount;
+
+    if (
+      state.phase === nextPhase &&
+      state.playerCount === nextPlayerCount
+    ) {
+      return state;
+    }
+
+    return {
+      phase: nextPhase,
+      playerCount: nextPlayerCount,
+    };
   });
 }
 
 export function handleRoundCrash(event: RoundCrashEvent) {
+  useMultiplierStore.getState().setMultiplier(event.crashPoint);
+
   useGameStore.setState({
     phase: "crash",
     roundId: event.roundId,
