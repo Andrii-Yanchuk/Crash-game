@@ -2,7 +2,7 @@
 
 import { Controls } from "./controls/Controls";
 import { History } from "./History";
-import { Footer } from "./Footer";
+import { Footer } from "./footer/Footer";
 import { useBalance } from "@/hooks/useBalance";
 import { useRecentRounds } from "@/hooks/useRecentRounds";
 import { CurveDisplay } from "./CurveDisplay";
