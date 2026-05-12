@@ -1,6 +1,9 @@
 "use client";
 
 import { useRecentStore } from "@/stores/recent";
+import { useShallow } from "zustand/react/shallow";
+
+const VISIBLE_ROUNDS_COUNT = 15;
 
 const TIER_CLASSES = {
   low: "border-[#82181A] bg-[#460809]/40 text-red-400",
@@ -9,11 +12,12 @@ const TIER_CLASSES = {
 };
 
 export function History() {
-  const rounds = useRecentStore((state) => state.rounds);
-  const visibleRounds = rounds.slice(0, 15);
+  const visibleRounds = useRecentStore(
+    useShallow((state) => state.rounds.slice(0, VISIBLE_ROUNDS_COUNT)),
+  );
 
   return (
-    <section className="scrollbar-none flex h-10 w-full max-w-[1500px] min-w-0 items-center gap-2 overflow-x-auto overflow-y-hidden">
+    <section className="scrollbar-none flex h-10 w-full max-w-375 min-w-0 items-center gap-2 overflow-x-auto overflow-y-hidden">
       {visibleRounds.map((round) => (
         <span
           key={round.roundId}
