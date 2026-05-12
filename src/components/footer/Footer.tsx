@@ -24,7 +24,6 @@ export function Footer({ username, onLogout }: FooterProps) {
     isReconnecting,
     isSoundEnabled,
     playerCount,
-    players,
     roundId,
     setIsSoundEnabled,
   } = useGameStore(
@@ -34,7 +33,6 @@ export function Footer({ username, onLogout }: FooterProps) {
       isReconnecting: state.isReconnecting,
       isSoundEnabled: state.isSoundEnabled,
       playerCount: state.playerCount,
-      players: state.players,
       roundId: state.roundId,
       setIsSoundEnabled: state.setIsSoundEnabled,
     })),
@@ -82,7 +80,6 @@ export function Footer({ username, onLogout }: FooterProps) {
 
       <PlayersPanel
         isOpen={isPlayersPanelOpen}
-        players={players}
         onClose={closePlayersPanel}
       />
     </>

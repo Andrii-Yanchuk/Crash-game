@@ -11,16 +11,10 @@ import { useGameStore } from "@/stores/game";
 import { useShallow } from "zustand/react/shallow";
 
 interface ControlsProps {
-  balanceErrorMessage?: string;
-  isBalanceError: boolean;
-  isBalanceLoading: boolean;
+  username: string;
 }
 
-export function Controls({
-  balanceErrorMessage,
-  isBalanceError,
-  isBalanceLoading,
-}: ControlsProps) {
+export function Controls({ username }: ControlsProps) {
   const { balance, betError, isBetPending, myBet, phase } = useGameStore(
     useShallow((state) => ({
       balance: state.balance,
@@ -82,9 +76,7 @@ export function Controls({
 
       <BalanceDisplay
         balance={balance}
-        errorMessage={balanceErrorMessage}
-        isError={isBalanceError}
-        isLoading={isBalanceLoading}
+        username={username}
       />
     </section>
   );

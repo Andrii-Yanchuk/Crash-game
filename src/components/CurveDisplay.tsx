@@ -5,7 +5,7 @@ import { useMultiplierStore } from "@/stores/multiplier";
 import { memo, useEffect, useRef, useState } from "react";
 
 const CURVE_POINTS_COUNT = 80;
-const COUNTDOWN_SERVER_DRIFT_MS = 4000;
+const COUNTDOWN_SERVER_DRIFT_MS = 1000;
 
 function getPhaseColor(phase: string, crashed: boolean) {
   if (crashed) {

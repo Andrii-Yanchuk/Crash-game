@@ -1,13 +1,14 @@
 import { PlayersList } from "./PlayersList";
-import type { PublicPlayer } from "@/types/type";
+import { useGameStore } from "@/stores/game";
 
 type PlayersPanelProps = {
   isOpen: boolean;
-  players: PublicPlayer[];
   onClose: () => void;
 };
 
-export function PlayersPanel({ isOpen, players, onClose }: PlayersPanelProps) {
+export function PlayersPanel({ isOpen, onClose }: PlayersPanelProps) {
+  const players = useGameStore((state) => state.players);
+
   return (
     <>
       <button

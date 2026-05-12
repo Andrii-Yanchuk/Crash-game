@@ -27,7 +27,6 @@ export function ConnectionStatus({
           className={`size-3 shrink-0 rounded-full ${connectionDotClassName}`}
         />
         <span className="shrink-0">{connectionLabel}</span>
-        <span className="text-[#4A5568]">вЂў</span>
         <span className="shrink-0">Round {displayedRoundId}</span>
         <Image
           src="/wifi-icon.svg"

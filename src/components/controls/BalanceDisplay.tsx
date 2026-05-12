@@ -1,18 +1,17 @@
 import Image from "next/image";
+import { useBalance } from "@/hooks/useBalance";
 
 type BalanceDisplayProps = {
   balance: number | null;
-  errorMessage?: string;
-  isError: boolean;
-  isLoading: boolean;
+  username: string;
 };
 
 export function BalanceDisplay({
   balance,
-  errorMessage,
-  isError,
-  isLoading,
+  username,
 }: BalanceDisplayProps) {
+  const { error, isError, isLoading } = useBalance(username);
+
   return (
     <>
       <div className="flex items-center justify-between border-t border-[#1A1F2E] pt-4">
@@ -28,8 +27,8 @@ export function BalanceDisplay({
               : (balance ?? 0).toFixed(2)}
         </span>
       </div>
-      {errorMessage ? (
-        <p className="mt-2 text-xs text-red-400">{errorMessage}</p>
+      {error?.message ? (
+        <p className="mt-2 text-xs text-red-400">{error.message}</p>
       ) : null}
     </>
   );
