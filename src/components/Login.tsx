@@ -24,7 +24,7 @@ export function Login({ onLogin }: LoginProps) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-8">
+    <div className="flex flex-1 flex-col items-center justify-center p-8">
       <div className="size-16 mb-4 bg-[#FBBF241A] rounded-full flex items-center justify-center border border-[#FBBF244D]">
         <Image src="/logo.svg" alt="Crash Game Logo" width={32} height={32} />
       </div>
