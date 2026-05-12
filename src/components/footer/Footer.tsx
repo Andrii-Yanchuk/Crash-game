@@ -5,7 +5,7 @@ import { getConnectionStatus, getDisplayedRoundId } from "./footerState";
 import { MobilePlayersButton } from "./MobilePlayersButton";
 import { SoundToggleButton } from "./SoundToggleButton";
 import { UserButton } from "./UserButton";
-import { PlayersPanel } from "./../PlayersPanel";
+import { PlayersPanel } from "../players/PlayersPanel";
 import { useGameStore } from "@/stores/game";
 import { useRef, useState } from "react";
 import { useShallow } from "zustand/react/shallow";

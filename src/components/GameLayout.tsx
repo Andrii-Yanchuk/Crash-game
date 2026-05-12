@@ -6,7 +6,7 @@ import { Footer } from "./footer/Footer";
 import { useBalance } from "@/hooks/useBalance";
 import { useRecentRounds } from "@/hooks/useRecentRounds";
 import { CurveDisplay } from "./CurveDisplay";
-import { PlayersList } from "./PlayersPanel";
+import { PlayersList } from "./players/PlayersList";
 import { useGameStore } from "@/stores/game";
 
 interface GameLayoutProps {
