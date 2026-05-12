@@ -18,10 +18,22 @@ export function Footer({ username, onLogout }: FooterProps) {
   const playerCount = useGameStore((state) => state.playerCount);
   const isSoundEnabled = useGameStore((state) => state.isSoundEnabled);
   const isConnected = useGameStore((state) => state.isConnected);
+  const isReconnecting = useGameStore((state) => state.isReconnecting);
+  const connectionError = useGameStore((state) => state.connectionError);
   const setIsSoundEnabled = useGameStore((state) => state.setIsSoundEnabled);
   const displayedRoundId = roundId?.replace("round_", "R#") ?? "R#----";
-  const connectionLabel = isConnected ? "Connected" : "Disconnected";
-  const connectionDotClassName = isConnected ? "bg-[#22C55E]" : "bg-[#EF4444]";
+  const connectionLabel = isConnected
+    ? "Connected"
+    : isReconnecting
+      ? "Reconnecting"
+      : connectionError
+        ? "Connection error"
+        : "Disconnected";
+  const connectionDotClassName = isConnected
+    ? "bg-[#22C55E]"
+    : isReconnecting
+      ? "bg-[#FBBF24]"
+      : "bg-[#EF4444]";
 
   function closePlayersPanel() {
     playersButtonRef.current?.focus();
