@@ -63,7 +63,7 @@ export const useGameStore = create<GameState>((set) => ({
   playerCount: 0,
   isBetPending: false,
   betError: null,
-  isSoundEnabled: true,
+  isSoundEnabled: false,
   isConnected: false,
   isReconnecting: false,
   connectionError: null,
