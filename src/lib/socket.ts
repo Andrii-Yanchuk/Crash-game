@@ -4,8 +4,14 @@ import type {
   ServerToClientEvents,
 } from "@/types/socket";
 
+const SOCKET_URL = process.env.NEXT_PUBLIC_WS_URL;
+
+if (!SOCKET_URL) {
+  throw new Error("NEXT_PUBLIC_WS_URL is not configured");
+}
+
 export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-  process.env.NEXT_PUBLIC_WS_URL!,
+  SOCKET_URL,
   {
     autoConnect: false,
   },
