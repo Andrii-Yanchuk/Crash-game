@@ -2,7 +2,7 @@
 
 import { useGameStore } from "@/stores/game";
 import { useMultiplierStore } from "@/stores/multiplier";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
 
 const CURVE_POINTS_COUNT = 80;
 const COUNTDOWN_SERVER_DRIFT_MS = 1000;
@@ -98,32 +98,41 @@ function drawCurve(
 function CurveDisplayComponent() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const multiplierTextRef = useRef<HTMLDivElement>(null);
+  const countdownTextRef = useRef<HTMLDivElement>(null);
   const phaseRef = useRef("waiting");
   const crashedRef = useRef(false);
   const phase = useGameStore((state) => state.phase);
   const endsAt = useGameStore((state) => state.endsAt);
-  const [now, setNow] = useState(() => Date.now());
   const crashed = phase === "crash";
   const phaseColor = getPhaseColor(phase, crashed);
   const initialMultiplier = useMultiplierStore.getState().multiplier;
-  const countdownSeconds =
-    phase === "waiting" && endsAt
-      ? Math.max(
-          0,
-          Math.ceil(
-            (endsAt.getTime() - COUNTDOWN_SERVER_DRIFT_MS - now) / 1000,
-          ),
-        )
-      : 0;
 
   useEffect(() => {
     if (phase !== "waiting" || !endsAt) {
       return;
     }
 
-    const intervalId = window.setInterval(() => {
-      setNow(Date.now());
-    }, 250);
+    const countdownEndsAt = endsAt;
+
+    function updateCountdown() {
+      const countdownSeconds = Math.max(
+        0,
+        Math.ceil(
+          (countdownEndsAt.getTime() -
+            COUNTDOWN_SERVER_DRIFT_MS -
+            Date.now()) /
+            1000,
+        ),
+      );
+
+      if (countdownTextRef.current) {
+        countdownTextRef.current.textContent = `${countdownSeconds}s`;
+      }
+    }
+
+    updateCountdown();
+
+    const intervalId = window.setInterval(updateCountdown, 250);
 
     return () => window.clearInterval(intervalId);
   }, [endsAt, phase]);
@@ -183,10 +192,11 @@ function CurveDisplayComponent() {
       {phase === "waiting" || phase === "start" ? (
         <div className="relative z-10 text-center">
           <div
+            ref={countdownTextRef}
             className="font-mono text-6xl tracking-tighter"
             style={{ color: phaseColor }}
           >
-            {phase === "waiting" ? `${countdownSeconds}s` : "1.00x"}
+            {phase === "waiting" ? "0s" : "1.00x"}
           </div>
           <div className="mt-2 text-[#7A8599]">Next round starting...</div>
         </div>
