@@ -32,8 +32,8 @@ export function Controls({ username }: ControlsProps) {
     isBetControlsDisabled,
   } = getBetControlState({ phase, myBet, isBetPending });
   const {
-    amount,
     autoCashOutAt,
+    defaultAmount,
     handleAmountChange,
     handleQuickAction,
     isAutoCashOutEnabled,
@@ -50,7 +50,7 @@ export function Controls({ username }: ControlsProps) {
   return (
     <section className="flex flex-col rounded-xl border border-[#1A1F2E] bg-[#0E1119] p-3">
       <BetAmountControl
-        amount={amount}
+        defaultAmount={defaultAmount}
         disabled={isBetControlsDisabled}
         onAmountChange={handleAmountChange}
         onQuickAction={handleQuickAction}

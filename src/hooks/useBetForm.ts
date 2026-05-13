@@ -5,7 +5,7 @@ import {
 import type { QuickBetAction } from "@/config/bet";
 import type { PlaceBetInput } from "@/hooks/useBetActions";
 import type { RoundPhase } from "@/types/type";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type UseBetFormInput = {
   balance: number | null;
@@ -22,31 +22,29 @@ export function useBetForm({
   cashOut,
   placeBet,
 }: UseBetFormInput) {
-  const [amount, setAmount] = useState(DEFAULT_BET_AMOUNT);
+  const amountRef = useRef(DEFAULT_BET_AMOUNT);
   const [isAutoCashOutEnabled, setIsAutoCashOutEnabled] = useState(false);
 
   function handleAmountChange(nextAmount: number) {
-    setAmount(nextAmount);
+    amountRef.current = nextAmount;
   }
 
-  function handleQuickAction(action: QuickBetAction) {
+  function handleQuickAction(action: QuickBetAction, currentAmount: number) {
     if (isBetControlsDisabled) {
-      return;
+      return currentAmount;
     }
 
-    if (action === "half") {
-      setAmount((currentAmount) => currentAmount / 2);
-      return;
-    }
+    const nextAmount =
+      action === "half"
+        ? currentAmount / 2
+        : action === "double"
+          ? currentAmount * 2
+          : typeof balance === "number"
+            ? balance
+            : currentAmount;
 
-    if (action === "double") {
-      setAmount((currentAmount) => currentAmount * 2);
-      return;
-    }
-
-    if (typeof balance === "number") {
-      setAmount(balance);
-    }
+    amountRef.current = nextAmount;
+    return nextAmount;
   }
 
   function toggleAutoCashOut() {
@@ -60,14 +58,14 @@ export function useBetForm({
     }
 
     placeBet({
-      amount,
+      amount: amountRef.current,
       autoCashOutAt: isAutoCashOutEnabled ? DEFAULT_AUTO_CASH_OUT_AT : null,
     });
   }
 
   return {
-    amount,
     autoCashOutAt: DEFAULT_AUTO_CASH_OUT_AT,
+    defaultAmount: DEFAULT_BET_AMOUNT,
     handleAmountChange,
     handleQuickAction,
     isAutoCashOutEnabled,

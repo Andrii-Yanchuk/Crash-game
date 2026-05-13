@@ -1,19 +1,40 @@
 import { QUICK_BET_ACTIONS } from "@/config/bet";
 import type { QuickBetAction } from "@/config/bet";
+import { useRef } from "react";
 
 type BetAmountControlProps = {
-  amount: number;
+  defaultAmount: number;
   disabled: boolean;
   onAmountChange: (amount: number) => void;
-  onQuickAction: (action: QuickBetAction) => void;
+  onQuickAction: (action: QuickBetAction, currentAmount: number) => number;
 };
 
 export function BetAmountControl({
-  amount,
+  defaultAmount,
   disabled,
   onAmountChange,
   onQuickAction,
 }: BetAmountControlProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function getCurrentAmount() {
+    if (!inputRef.current) {
+      return 0;
+    }
+
+    const currentAmount = inputRef.current.valueAsNumber;
+
+    return Number.isFinite(currentAmount) ? currentAmount : 0;
+  }
+
+  function handleQuickAction(action: QuickBetAction) {
+    const nextAmount = onQuickAction(action, getCurrentAmount());
+
+    if (inputRef.current) {
+      inputRef.current.value = String(nextAmount);
+    }
+  }
+
   return (
     <>
       <label
@@ -25,10 +46,11 @@ export function BetAmountControl({
 
       <div className="mb-2 flex h-10 items-center rounded-[9px] border border-[#1A1F2E] bg-[#111620] px-3">
         <input
+          ref={inputRef}
           id="bet-amount"
           type="number"
           min="0"
-          value={amount}
+          defaultValue={defaultAmount}
           onChange={(event) => onAmountChange(event.target.valueAsNumber || 0)}
           disabled={disabled}
           className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none disabled:cursor-not-allowed disabled:text-[#7A8599] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
@@ -44,7 +66,7 @@ export function BetAmountControl({
             key={action.id}
             type="button"
             disabled={disabled}
-            onClick={() => onQuickAction(action.id)}
+            onClick={() => handleQuickAction(action.id)}
             className="h-6 rounded-md border border-[#1A1F2E] bg-[#111620] text-xs font-medium text-[#7A8599] transition hover:bg-[#1A1F2E] cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#111620]"
           >
             {action.label}
