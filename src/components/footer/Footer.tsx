@@ -22,19 +22,15 @@ export function Footer({ username, onLogout }: FooterProps) {
     connectionError,
     isConnected,
     isReconnecting,
-    isSoundEnabled,
     playerCount,
     roundId,
-    setIsSoundEnabled,
   } = useGameStore(
     useShallow((state) => ({
       connectionError: state.connectionError,
       isConnected: state.isConnected,
       isReconnecting: state.isReconnecting,
-      isSoundEnabled: state.isSoundEnabled,
       playerCount: state.playerCount,
       roundId: state.roundId,
-      setIsSoundEnabled: state.setIsSoundEnabled,
     })),
   );
   const displayedRoundId = getDisplayedRoundId(roundId);
@@ -71,10 +67,7 @@ export function Footer({ username, onLogout }: FooterProps) {
         <div className="flex items-center gap-3">
           <UserButton username={username} onLogout={onLogout} />
 
-          <SoundToggleButton
-            isSoundEnabled={isSoundEnabled}
-            onToggle={() => setIsSoundEnabled(!isSoundEnabled)}
-          />
+          <SoundToggleButton />
         </div>
       </footer>
 

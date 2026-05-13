@@ -32,7 +32,6 @@ type GameState = {
   playerCount: number;
   isBetPending: boolean;
   betError: string | null;
-  isSoundEnabled: boolean;
   isConnected: boolean;
   isReconnecting: boolean;
   connectionError: string | null;
@@ -41,7 +40,6 @@ type GameState = {
   setIsBetPending: (isBetPending: boolean) => void;
   setBetError: (betError: string | null) => void;
   clearBetError: () => void;
-  setIsSoundEnabled: (isSoundEnabled: boolean) => void;
   setIsConnected: (isConnected: boolean) => void;
   setIsReconnecting: (isReconnecting: boolean) => void;
   setConnectionError: (connectionError: string | null) => void;
@@ -63,7 +61,6 @@ export const useGameStore = create<GameState>((set) => ({
   playerCount: 0,
   isBetPending: false,
   betError: null,
-  isSoundEnabled: false,
   isConnected: false,
   isReconnecting: false,
   connectionError: null,
@@ -72,7 +69,6 @@ export const useGameStore = create<GameState>((set) => ({
   setIsBetPending: (isBetPending) => set({ isBetPending }),
   setBetError: (betError) => set({ betError }),
   clearBetError: () => set({ betError: null }),
-  setIsSoundEnabled: (isSoundEnabled) => set({ isSoundEnabled }),
   setIsConnected: (isConnected) => set({ isConnected }),
   setIsReconnecting: (isReconnecting) => set({ isReconnecting }),
   setConnectionError: (connectionError) => set({ connectionError }),

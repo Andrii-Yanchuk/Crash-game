@@ -1,6 +1,7 @@
 import { MAX_BET_AMOUNT } from "@/config/bet";
 import { socket } from "@/lib/socket";
 import { useGameStore } from "@/stores/game";
+import { getIsSoundEnabled } from "@/stores/sound";
 import useSound from "use-sound";
 
 export type PlaceBetInput = {
@@ -17,9 +18,7 @@ function validateBetAmount(amount: number) {
 }
 
 export function useBetActions() {
-  const isSoundEnabled = useGameStore((state) => state.isSoundEnabled);
   const [playBetSound] = useSound("/sounds/bet.mp3", {
-    soundEnabled: isSoundEnabled,
     volume: 0.6,
   });
 
@@ -53,7 +52,9 @@ export function useBetActions() {
 
     setBetError(null);
     setIsBetPending(true);
-    playBetSound();
+    if (getIsSoundEnabled()) {
+      playBetSound();
+    }
     socket.emit("bet:place", {
       amount,
       autoCashOutAt,
