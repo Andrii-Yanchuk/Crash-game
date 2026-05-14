@@ -3,9 +3,9 @@
 import { Controls } from "./controls/Controls";
 import { History } from "./History";
 import { Footer } from "./footer/Footer";
-import { GameDataBootstrap } from "./GameDataBootstrap";
 import { CurveDisplay } from "./CurveDisplay";
 import { DesktopPlayersList } from "./players/DesktopPlayersList";
+import { useRecentRounds } from "@/hooks/useRecentRounds";
 
 interface GameLayoutProps {
   username: string;
@@ -13,10 +13,11 @@ interface GameLayoutProps {
 }
 
 export function GameLayout({ username, onLogout }: GameLayoutProps) {
+  useRecentRounds(username);
+
   return (
     <div className="flex min-h-screen w-full flex-col text-white">
-      <GameDataBootstrap username={username} />
-      <main className="grid flex-1 grid-cols-1 gap-3 px-3 pt-3 pb-[52px] lg:grid-cols-[340px_minmax(0,1fr)_340px] lg:grid-rows-[auto_minmax(0,1fr)]">
+      <main className="grid flex-1 grid-cols-1 gap-3 px-3 pt-3 pb-13 lg:grid-cols-[340px_minmax(0,1fr)_340px] lg:grid-rows-[auto_minmax(0,1fr)]">
         <div className="flex min-w-0 justify-center lg:col-start-2 lg:row-start-1">
           <History />
         </div>
