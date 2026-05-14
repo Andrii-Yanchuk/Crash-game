@@ -14,6 +14,7 @@ export function handleBetPlaced(event: BetPlacedEvent) {
       : null),
     isBetPending: false,
     betError: null,
+    lastProfit: null,
     myBet: {
       betId: event.betId,
       amount: event.amount,
@@ -28,6 +29,7 @@ export function handleBetCashedOut(event: BetCashedOutEvent) {
     balance: event.balance,
     isBetPending: false,
     betError: null,
+    lastProfit: event.profit,
     myBet: null,
   });
 }
@@ -36,6 +38,7 @@ export function handleBetLost(event: BetLostEvent) {
   useGameStore.setState({
     balance: event.balance,
     isBetPending: false,
+    lastProfit: null,
     myBet: null,
   });
 }

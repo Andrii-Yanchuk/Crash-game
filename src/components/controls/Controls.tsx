@@ -7,7 +7,9 @@ import { BetSubmitButton } from "./BetSubmitButton";
 import { useBetActions } from "@/hooks/useBetActions";
 import { useBetForm } from "@/hooks/useBetForm";
 import { getBetControlState } from "@/lib/betControlState";
+import { formatUsd } from "@/lib/format";
 import { useGameStore } from "@/stores/game";
+import { useMultiplierStore } from "@/stores/multiplier";
 import { useShallow } from "zustand/react/shallow";
 
 interface ControlsProps {
@@ -15,26 +17,31 @@ interface ControlsProps {
 }
 
 export function Controls({ username }: ControlsProps) {
-  const { balance, betError, isBetPending, myBet, phase } = useGameStore(
-    useShallow((state) => ({
-      balance: state.balance,
-      betError: state.betError,
-      isBetPending: state.isBetPending,
-      myBet: state.myBet,
-      phase: state.phase,
-    })),
-  );
+  const { balance, betError, isBetPending, lastProfit, myBet, phase } =
+    useGameStore(
+      useShallow((state) => ({
+        balance: state.balance,
+        betError: state.betError,
+        isBetPending: state.isBetPending,
+        lastProfit: state.lastProfit,
+        myBet: state.myBet,
+        phase: state.phase,
+      })),
+    );
+  const multiplier = useMultiplierStore((state) => state.multiplier);
   const { cashOut, placeBet } = useBetActions();
   const {
     betButtonClassName,
     betButtonLabel,
     isBetButtonDisabled,
     isBetControlsDisabled,
-  } = getBetControlState({ phase, myBet, isBetPending });
+  } = getBetControlState({ phase, myBet, isBetPending, multiplier });
   const {
     autoCashOutAt,
     defaultAmount,
     handleAmountChange,
+    handleAutoCashOutAtBlur,
+    handleAutoCashOutAtChange,
     handleQuickAction,
     isAutoCashOutEnabled,
     submitBetAction,
@@ -60,6 +67,8 @@ export function Controls({ username }: ControlsProps) {
         autoCashOutAt={autoCashOutAt}
         disabled={isBetControlsDisabled}
         isEnabled={isAutoCashOutEnabled}
+        onAutoCashOutAtBlur={handleAutoCashOutAtBlur}
+        onAutoCashOutAtChange={handleAutoCashOutAtChange}
         onToggle={toggleAutoCashOut}
       />
 
@@ -69,6 +78,12 @@ export function Controls({ username }: ControlsProps) {
         label={betButtonLabel}
         onClick={submitBetAction}
       />
+
+      {lastProfit && lastProfit > 0 ? (
+        <p className="mb-3 text-center text-sm font-semibold text-[#22C55E]">
+          +{formatUsd(lastProfit)}
+        </p>
+      ) : null}
 
       {betError ? (
         <p className="mb-3 text-xs font-medium text-red-400">{betError}</p>

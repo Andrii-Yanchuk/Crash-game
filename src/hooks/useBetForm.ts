@@ -4,6 +4,11 @@ import {
 } from "@/config/bet";
 import type { QuickBetAction } from "@/config/bet";
 import type { PlaceBetInput } from "@/hooks/useBetActions";
+import {
+  isValidDecimalInput,
+  normalizeAutoCashOutAt,
+  parseDecimalInput,
+} from "@/lib/betInput";
 import type { RoundPhase } from "@/types/type";
 import { useRef, useState } from "react";
 
@@ -23,6 +28,9 @@ export function useBetForm({
   placeBet,
 }: UseBetFormInput) {
   const amountRef = useRef(DEFAULT_BET_AMOUNT);
+  const [autoCashOutAt, setAutoCashOutAt] = useState(
+    String(DEFAULT_AUTO_CASH_OUT_AT),
+  );
   const [isAutoCashOutEnabled, setIsAutoCashOutEnabled] = useState(false);
 
   function handleAmountChange(nextAmount: number) {
@@ -47,6 +55,18 @@ export function useBetForm({
     return nextAmount;
   }
 
+  function handleAutoCashOutAtChange(nextAutoCashOutAt: string) {
+    if (isValidDecimalInput(nextAutoCashOutAt)) {
+      setAutoCashOutAt(nextAutoCashOutAt);
+    }
+  }
+
+  function handleAutoCashOutAtBlur() {
+    setAutoCashOutAt((value) =>
+      String(normalizeAutoCashOutAt(parseDecimalInput(value))),
+    );
+  }
+
   function toggleAutoCashOut() {
     setIsAutoCashOutEnabled((value) => !value);
   }
@@ -59,14 +79,18 @@ export function useBetForm({
 
     placeBet({
       amount: amountRef.current,
-      autoCashOutAt: isAutoCashOutEnabled ? DEFAULT_AUTO_CASH_OUT_AT : null,
+      autoCashOutAt: isAutoCashOutEnabled
+        ? normalizeAutoCashOutAt(parseDecimalInput(autoCashOutAt))
+        : null,
     });
   }
 
   return {
-    autoCashOutAt: DEFAULT_AUTO_CASH_OUT_AT,
+    autoCashOutAt,
     defaultAmount: DEFAULT_BET_AMOUNT,
     handleAmountChange,
+    handleAutoCashOutAtChange,
+    handleAutoCashOutAtBlur,
     handleQuickAction,
     isAutoCashOutEnabled,
     submitBetAction,

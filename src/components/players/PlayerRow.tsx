@@ -3,6 +3,7 @@ import {
   getPlayerLabel,
   getPlayerStatusClassName,
 } from "./playerView";
+import { formatAmount } from "@/lib/format";
 import type { PublicPlayer } from "@/types/type";
 
 type PlayerRowProps = {
@@ -11,6 +12,8 @@ type PlayerRowProps = {
 };
 
 export function PlayerRow({ index, player }: PlayerRowProps) {
+  const displayedAmount = player.amount > 0 ? formatAmount(player.amount) : "-";
+
   return (
     <div className="flex h-14 items-center gap-3 rounded-lg bg-[#101621] px-3">
       <div
@@ -25,7 +28,9 @@ export function PlayerRow({ index, player }: PlayerRowProps) {
         <p className="truncate text-sm font-medium leading-5 text-white">
           {player.username}
         </p>
-        <p className="text-xs leading-4 text-[#7A8599]">{player.amount} USD</p>
+        <p className="text-xs leading-4 text-[#7A8599]">
+          {displayedAmount} USD
+        </p>
       </div>
 
       <span

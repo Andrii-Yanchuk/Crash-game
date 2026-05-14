@@ -10,16 +10,24 @@ export function UserButton({ onLogout, username }: UserButtonProps) {
     <button
       type="button"
       onClick={onLogout}
-      className="flex h-10 max-w-36 items-center gap-1.5 rounded-full bg-[#101621] px-4 text-sm font-medium text-white transition hover:bg-[#171E2B] cursor-pointer"
+      className="flex h-5 max-w-36 items-center gap-1.5 rounded-full bg-[#101621] px-2 text-sm font-medium text-white transition hover:bg-[#171E2B] cursor-pointer"
     >
-      <span className="min-w-0 truncate">{username}</span>
       <Image
-        src="/logout-icon.svg"
-        alt=""
+        src="/user-icon.svg"
+        alt="user icon"
         aria-hidden="true"
         width={16}
         height={16}
-        className="shrink-0"
+        className="hidden md:block size-3"
+      />
+      <span className="min-w-0 text-[10px] md:text-xs">{username}</span>
+      <Image
+        src="/logout-icon.svg"
+        alt="logout icon"
+        aria-hidden="true"
+        width={16}
+        height={16}
+        className="size-2.5 md:size-3"
       />
     </button>
   );

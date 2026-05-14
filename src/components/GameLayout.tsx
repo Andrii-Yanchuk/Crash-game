@@ -16,7 +16,7 @@ export function GameLayout({ username, onLogout }: GameLayoutProps) {
   return (
     <div className="flex min-h-screen w-full flex-col text-white">
       <GameDataBootstrap username={username} />
-      <main className="grid flex-1 grid-cols-1 gap-3 p-3 lg:grid-cols-[340px_minmax(0,1fr)_340px] lg:grid-rows-[auto_minmax(0,1fr)]">
+      <main className="grid flex-1 grid-cols-1 gap-3 px-3 pt-3 pb-[52px] lg:grid-cols-[340px_minmax(0,1fr)_340px] lg:grid-rows-[auto_minmax(0,1fr)]">
         <div className="flex min-w-0 justify-center lg:col-start-2 lg:row-start-1">
           <History />
         </div>

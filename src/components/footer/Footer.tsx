@@ -18,21 +18,16 @@ interface FooterProps {
 export function Footer({ username, onLogout }: FooterProps) {
   const [isPlayersPanelOpen, setIsPlayersPanelOpen] = useState(false);
   const playersButtonRef = useRef<HTMLButtonElement>(null);
-  const {
-    connectionError,
-    isConnected,
-    isReconnecting,
-    playerCount,
-    roundId,
-  } = useGameStore(
-    useShallow((state) => ({
-      connectionError: state.connectionError,
-      isConnected: state.isConnected,
-      isReconnecting: state.isReconnecting,
-      playerCount: state.playerCount,
-      roundId: state.roundId,
-    })),
-  );
+  const { connectionError, isConnected, isReconnecting, playerCount, roundId } =
+    useGameStore(
+      useShallow((state) => ({
+        connectionError: state.connectionError,
+        isConnected: state.isConnected,
+        isReconnecting: state.isReconnecting,
+        playerCount: state.playerCount,
+        roundId: state.roundId,
+      })),
+    );
   const displayedRoundId = getDisplayedRoundId(roundId);
   const { dotClassName: connectionDotClassName, label: connectionLabel } =
     getConnectionStatus({
@@ -48,7 +43,7 @@ export function Footer({ username, onLogout }: FooterProps) {
 
   return (
     <>
-      <footer className="flex h-18 items-center justify-between border-t border-[#1A1F2E] bg-[#0B0E16] px-4 text-[#7A8599]">
+      <footer className="fixed inset-x-0 bottom-0 z-40 flex h-10 items-center justify-between border-t border-[#1A1F2E] bg-[#0B0E16] px-4 text-[#7A8599]">
         <div className="flex min-w-0 items-center gap-3">
           <ConnectionStatus
             connectionDotClassName={connectionDotClassName}
@@ -71,10 +66,7 @@ export function Footer({ username, onLogout }: FooterProps) {
         </div>
       </footer>
 
-      <PlayersPanel
-        isOpen={isPlayersPanelOpen}
-        onClose={closePlayersPanel}
-      />
+      <PlayersPanel isOpen={isPlayersPanelOpen} onClose={closePlayersPanel} />
     </>
   );
 }

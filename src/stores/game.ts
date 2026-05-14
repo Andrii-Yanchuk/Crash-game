@@ -28,6 +28,7 @@ type GameState = {
   crashPoint: number | null;
   crashFlash: boolean;
   myBet: MyBet | null;
+  lastProfit: number | null;
   players: PublicPlayer[];
   playerCount: number;
   isBetPending: boolean;
@@ -57,6 +58,7 @@ export const useGameStore = create<GameState>((set) => ({
   crashPoint: null,
   crashFlash: false,
   myBet: null,
+  lastProfit: null,
   players: [],
   playerCount: 0,
   isBetPending: false,
@@ -99,6 +101,7 @@ export const useGameStore = create<GameState>((set) => ({
       multiplier: event.currentMultiplier,
       crashPoint: event.crashPoint,
       myBet: event.yourBet,
+      ...(event.yourBet ? { lastProfit: null } : null),
       players: event.players ?? [],
       playerCount: getPlayerCount(event),
       isBetPending: false,

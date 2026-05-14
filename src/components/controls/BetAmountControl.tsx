@@ -1,5 +1,7 @@
 import { QUICK_BET_ACTIONS } from "@/config/bet";
 import type { QuickBetAction } from "@/config/bet";
+import { isValidDecimalInput, parseDecimalInput } from "@/lib/betInput";
+import { formatAmount } from "@/lib/format";
 import { useRef } from "react";
 
 type BetAmountControlProps = {
@@ -18,21 +20,32 @@ export function BetAmountControl({
   const inputRef = useRef<HTMLInputElement>(null);
 
   function getCurrentAmount() {
-    if (!inputRef.current) {
-      return 0;
-    }
-
-    const currentAmount = inputRef.current.valueAsNumber;
-
-    return Number.isFinite(currentAmount) ? currentAmount : 0;
+    return parseDecimalInput(inputRef.current?.value ?? "");
   }
 
   function handleQuickAction(action: QuickBetAction) {
     const nextAmount = onQuickAction(action, getCurrentAmount());
 
     if (inputRef.current) {
-      inputRef.current.value = String(nextAmount);
+      inputRef.current.value = formatAmount(nextAmount);
     }
+  }
+
+  function handleBlur() {
+    if (inputRef.current) {
+      inputRef.current.value = formatAmount(getCurrentAmount());
+    }
+  }
+
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const { value } = event.target;
+
+    if (isValidDecimalInput(value)) {
+      onAmountChange(parseDecimalInput(value));
+      return;
+    }
+
+    event.target.value = formatAmount(getCurrentAmount());
   }
 
   return (
@@ -48,10 +61,11 @@ export function BetAmountControl({
         <input
           ref={inputRef}
           id="bet-amount"
-          type="number"
-          min="0"
-          defaultValue={defaultAmount}
-          onChange={(event) => onAmountChange(event.target.valueAsNumber || 0)}
+          type="text"
+          inputMode="decimal"
+          defaultValue={formatAmount(defaultAmount)}
+          onBlur={handleBlur}
+          onChange={handleChange}
           disabled={disabled}
           className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none disabled:cursor-not-allowed disabled:text-[#7A8599] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />

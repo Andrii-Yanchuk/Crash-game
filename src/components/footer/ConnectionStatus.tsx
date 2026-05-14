@@ -17,14 +17,14 @@ export function ConnectionStatus({
     <>
       <div className="flex items-center gap-2 text-sm font-medium md:hidden">
         <span
-          className={`size-2.5 shrink-0 rounded-full ${connectionDotClassName}`}
+          className={`size-1.5 shrink-0 rounded-full ${connectionDotClassName}`}
         />
-        <span>{displayedRoundId}</span>
+        <span className="text-[10px]">{displayedRoundId}</span>
       </div>
 
       <div className="hidden min-w-0 items-center gap-2 text-sm font-medium md:flex">
         <span
-          className={`size-3 shrink-0 rounded-full ${connectionDotClassName}`}
+          className={`size-2 shrink-0 rounded-full ${connectionDotClassName}`}
         />
         <span className="shrink-0">{connectionLabel}</span>
         <span className="shrink-0">Round {displayedRoundId}</span>

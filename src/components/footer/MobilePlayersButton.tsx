@@ -18,16 +18,17 @@ export function MobilePlayersButton({
       type="button"
       aria-label="Open live players"
       onClick={onClick}
-      className="flex h-11 items-center gap-2 rounded-full bg-[#101621] px-4 text-white transition hover:bg-[#171E2B] cursor-pointer md:hidden"
+      className="flex h-6 items-center gap-2 rounded-full bg-[#101621] px-2 text-white transition hover:bg-[#171E2B] cursor-pointer md:hidden"
     >
       <Image
         src="/players-icon.svg"
-        alt=""
+        alt="players icon"
         aria-hidden="true"
         width={24}
         height={24}
+        className="size-4"
       />
-      <span className="font-mono text-lg font-semibold">{playerCount}</span>
+      <span className="font-mono text-xs font-semibold">{playerCount}</span>
     </button>
   );
 }

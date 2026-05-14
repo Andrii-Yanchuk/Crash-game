@@ -53,6 +53,7 @@ export function handleRoundWaiting(event: RoundWaitingEvent) {
     crashPoint: null,
     crashFlash: false,
     myBet: null,
+    lastProfit: null,
     players: event.players ?? [],
     playerCount: getPlayerCount(event),
   });
@@ -68,6 +69,7 @@ export function handleRoundStart(event: RoundStartEvent) {
     multiplier: 1,
     crashPoint: null,
     crashFlash: false,
+    lastProfit: null,
     players: event.players ?? [],
     playerCount: getPlayerCount(event),
   });

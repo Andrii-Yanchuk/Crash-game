@@ -1,3 +1,4 @@
+import { formatAmount } from "@/lib/format";
 import Image from "next/image";
 import { useBalance } from "@/hooks/useBalance";
 
@@ -24,7 +25,7 @@ export function BalanceDisplay({
             ? "Loading..."
             : isError
               ? "Error"
-              : (balance ?? 0).toFixed(2)}
+              : formatAmount(balance ?? 0)}
         </span>
       </div>
       {error?.message ? (
