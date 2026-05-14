@@ -4,7 +4,7 @@ import { LoginForm } from "./login/LoginForm";
 import { LoginHeader } from "./login/LoginHeader";
 
 type LoginProps = {
-  onLogin: (username: string) => void;
+  onLogin: (username: string, rememberMe: boolean) => void;
 };
 
 export function Login({ onLogin }: LoginProps) {

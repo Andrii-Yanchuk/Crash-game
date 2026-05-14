@@ -5,7 +5,9 @@ const USERNAME_STORAGE_KEY = "crash-game-username";
 const USERNAME_CHANGE_EVENT = "crash-game-username-change";
 
 function getStoredUsername() {
-  const username = sessionStorage.getItem(USERNAME_STORAGE_KEY);
+  const username =
+    localStorage.getItem(USERNAME_STORAGE_KEY) ??
+    sessionStorage.getItem(USERNAME_STORAGE_KEY);
 
   if (!username || !isValidUsername(username)) {
     return null;
@@ -33,19 +35,28 @@ export function useAuth() {
     getServerUsername,
   );
 
-  function login(nextUsername: string) {
+  function login(nextUsername: string, rememberMe: boolean) {
     const username = nextUsername.trim();
 
     if (!isValidUsername(username)) {
       return;
     }
 
-    sessionStorage.setItem(USERNAME_STORAGE_KEY, username);
+    sessionStorage.removeItem(USERNAME_STORAGE_KEY);
+    localStorage.removeItem(USERNAME_STORAGE_KEY);
+
+    if (rememberMe) {
+      localStorage.setItem(USERNAME_STORAGE_KEY, username);
+    } else {
+      sessionStorage.setItem(USERNAME_STORAGE_KEY, username);
+    }
+
     window.dispatchEvent(new Event(USERNAME_CHANGE_EVENT));
   }
 
   function logout() {
     sessionStorage.removeItem(USERNAME_STORAGE_KEY);
+    localStorage.removeItem(USERNAME_STORAGE_KEY);
     window.dispatchEvent(new Event(USERNAME_CHANGE_EVENT));
   }
 

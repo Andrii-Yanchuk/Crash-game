@@ -4,13 +4,15 @@ import { useLoginForm } from "@/hooks/useLoginForm";
 import { USERNAME_REQUIREMENTS } from "@/lib/username";
 
 type LoginFormProps = {
-  onLogin: (username: string) => void;
+  onLogin: (username: string, rememberMe: boolean) => void;
 };
 
 export function LoginForm({ onLogin }: LoginFormProps) {
   const {
     handleSubmit,
     isSubmitDisabled,
+    rememberMe,
+    setRememberMe,
     setUsername,
     shouldShowUsernameError,
     username,
@@ -23,7 +25,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
     >
       <label
         htmlFor="username"
-        className="text-[#7A8599] uppercase text-xs mb-2"
+        className="text-[#7A8599] uppercase text-xs mb-2 w-fit"
       >
         username
       </label>
@@ -38,9 +40,22 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         autoComplete="username"
         className="bg-[#111620] border border-[#1A1F2E] text-white px-4 py-2 mb-2 rounded focus:outline-none focus:ring-2 focus:ring-[#FBBF24] transition"
       />
-      <span id="username-requirements" className="text-[#7A8599] text-xs mb-6">
+      <span id="username-requirements" className="text-[#7A8599] text-xs mb-4">
         {USERNAME_REQUIREMENTS}
       </span>
+
+      <div className="mb-6 flex items-center gap-2 text-sm font-medium text-[#7A8599]">
+        <label htmlFor="remember-me">Remember me</label>
+        <input
+          id="remember-me"
+          type="checkbox"
+          aria-label="Remember me"
+          checked={rememberMe}
+          onChange={(event) => setRememberMe(event.target.checked)}
+          className="size-4 accent-[#FBBF24] cursor-pointer"
+        />
+      </div>
+
       <button
         type="submit"
         disabled={isSubmitDisabled}

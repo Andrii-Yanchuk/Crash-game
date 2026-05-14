@@ -3,11 +3,12 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 
 type UseLoginFormInput = {
-  onLogin: (username: string) => void;
+  onLogin: (username: string, rememberMe: boolean) => void;
 };
 
 export function useLoginForm({ onLogin }: UseLoginFormInput) {
   const [username, setUsername] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const trimmedUsername = username.trim();
   const hasUsernameInput = trimmedUsername.length > 0;
   const isUsernameValid = isValidUsername(trimmedUsername);
@@ -20,12 +21,14 @@ export function useLoginForm({ onLogin }: UseLoginFormInput) {
       return;
     }
 
-    onLogin(trimmedUsername);
+    onLogin(trimmedUsername, rememberMe);
   }
 
   return {
     handleSubmit,
     isSubmitDisabled: !isUsernameValid,
+    rememberMe,
+    setRememberMe,
     setUsername,
     shouldShowUsernameError,
     username,
