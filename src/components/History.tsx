@@ -1,6 +1,8 @@
 "use client";
 
+import type { RecentRound } from "@/stores/recent";
 import { useRecentStore } from "@/stores/recent";
+import { memo } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 const VISIBLE_ROUNDS_COUNT = 15;
@@ -11,21 +13,44 @@ const TIER_CLASSES = {
   high: "border-[#0D542B] bg-[#032E1566]/40 text-green-400",
 };
 
-export function History() {
-  const visibleRounds = useRecentStore(
-    useShallow((state) => state.rounds.slice(0, VISIBLE_ROUNDS_COUNT)),
+function HistoryRoundPill({ roundId }: { roundId: string }) {
+  const round = useRecentStore((state) =>
+    state.rounds.find((item) => item.roundId === roundId),
+  );
+
+  if (!round) {
+    return null;
+  }
+
+  return (
+    <span
+      className={`shrink-0 rounded-[40px] border px-2 py-0.5 text-xs font-semibold ${
+        TIER_CLASSES[round.tier]
+      }`}
+    >
+      {round.crashPoint.toFixed(2)}x
+    </span>
+  );
+}
+
+const MemoizedHistoryRoundPill = memo(HistoryRoundPill);
+
+function HistoryComponent() {
+  const visibleRoundIds = useRecentStore(
+    useShallow((state) =>
+      state.rounds
+        .slice(0, VISIBLE_ROUNDS_COUNT)
+        .map((round: RecentRound) => round.roundId),
+    ),
   );
 
   return (
     <section className="scrollbar-none flex h-10 w-full max-w-375 min-w-0 items-center gap-2 overflow-x-auto overflow-y-hidden">
-      {visibleRounds.map((round) => (
-        <span
-          key={round.roundId}
-          className={`shrink-0 rounded-[40px] border px-2 py-0.5 text-xs font-semibold ${TIER_CLASSES[round.tier]}`}
-        >
-          {round.crashPoint.toFixed(2)}x
-        </span>
+      {visibleRoundIds.map((roundId) => (
+        <MemoizedHistoryRoundPill key={roundId} roundId={roundId} />
       ))}
     </section>
   );
 }
+
+export const History = memo(HistoryComponent);

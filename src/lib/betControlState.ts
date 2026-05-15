@@ -35,14 +35,12 @@ type BetControlStateInput = {
   phase: RoundPhase;
   myBet: MyBet | null;
   isBetPending: boolean;
-  multiplier: number;
 };
 
 export function getBetControlState({
   phase,
   myBet,
   isBetPending,
-  multiplier,
 }: BetControlStateInput) {
   const hasPlacedBet = phase === "waiting" && Boolean(myBet);
   const canCashOut = phase === "tick" && Boolean(myBet);
@@ -57,11 +55,10 @@ export function getBetControlState({
     isWaitingForNextRound;
   const isBetControlsDisabled =
     isBetPending || Boolean(myBet) || phase !== "waiting";
-  const cashOutAmount = myBet ? myBet.amount * multiplier : 0;
   const betButtonLabel = isBetPending
     ? "Loading..."
     : canCashOut
-      ? `Cash Out - ${formatAmount(cashOutAmount)}`
+      ? "Cash Out"
       : isWaitingForNextRound
         ? "Wait for next round"
         : hasPlacedBet

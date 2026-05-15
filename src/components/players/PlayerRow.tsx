@@ -4,14 +4,23 @@ import {
   getPlayerStatusClassName,
 } from "./playerView";
 import { formatAmount } from "@/lib/format";
-import type { PublicPlayer } from "@/types/type";
+import { useGameStore } from "@/stores/game";
+import { memo } from "react";
 
 type PlayerRowProps = {
   index: number;
-  player: PublicPlayer;
+  username: string;
 };
 
-export function PlayerRow({ index, player }: PlayerRowProps) {
+function PlayerRowComponent({ index, username }: PlayerRowProps) {
+  const player = useGameStore((state) =>
+    state.players.find((item) => item.username === username),
+  );
+
+  if (!player) {
+    return null;
+  }
+
   const displayedAmount = player.amount > 0 ? formatAmount(player.amount) : "-";
 
   return (
@@ -43,3 +52,5 @@ export function PlayerRow({ index, player }: PlayerRowProps) {
     </div>
   );
 }
+
+export const PlayerRow = memo(PlayerRowComponent);

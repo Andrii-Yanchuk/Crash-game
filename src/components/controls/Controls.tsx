@@ -9,7 +9,6 @@ import { useBetForm } from "@/hooks/useBetForm";
 import { getBetControlState } from "@/lib/betControlState";
 import { formatUsd } from "@/lib/format";
 import { useGameStore } from "@/stores/game";
-import { useMultiplierStore } from "@/stores/multiplier";
 import { useShallow } from "zustand/react/shallow";
 
 interface ControlsProps {
@@ -28,14 +27,13 @@ export function Controls({ username }: ControlsProps) {
         phase: state.phase,
       })),
     );
-  const multiplier = useMultiplierStore((state) => state.multiplier);
   const { cashOut, placeBet } = useBetActions();
   const {
     betButtonClassName,
     betButtonLabel,
     isBetButtonDisabled,
     isBetControlsDisabled,
-  } = getBetControlState({ phase, myBet, isBetPending, multiplier });
+  } = getBetControlState({ phase, myBet, isBetPending });
   const {
     autoCashOutAt,
     defaultAmount,
@@ -73,6 +71,7 @@ export function Controls({ username }: ControlsProps) {
       />
 
       <BetSubmitButton
+        betAmount={phase === "tick" && myBet ? myBet.amount : null}
         className={betButtonClassName}
         disabled={isBetButtonDisabled}
         label={betButtonLabel}

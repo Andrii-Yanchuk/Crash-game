@@ -1,18 +1,22 @@
 import { PlayerRow } from "./PlayerRow";
-import type { PublicPlayer } from "@/types/type";
+import { useGameStore } from "@/stores/game";
 import Image from "next/image";
+import { memo } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 type PlayersListProps = {
-  players: PublicPlayer[];
   className?: string;
   onClose?: () => void;
 };
 
-export function PlayersList({
-  players,
+function PlayersListComponent({
   className = "",
   onClose,
 }: PlayersListProps) {
+  const playerUsernames = useGameStore(
+    useShallow((state) => state.players.map((player) => player.username)),
+  );
+
   return (
     <section
       className={`flex min-h-0 flex-col overflow-hidden rounded-xl border border-[#1A1F2E] bg-[#0B0E16] text-white ${className}`}
@@ -26,7 +30,7 @@ export function PlayersList({
             width={16}
             height={16}
           />
-          <span>Live players ({players.length})</span>
+          <span>Live players ({playerUsernames.length})</span>
         </div>
 
         {onClose ? (
@@ -48,11 +52,11 @@ export function PlayersList({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-4">
-        {players.map((player, index) => (
-          <PlayerRow key={player.username} index={index} player={player} />
+        {playerUsernames.map((username, index) => (
+          <PlayerRow key={username} index={index} username={username} />
         ))}
 
-        {players.length === 0 ? (
+        {playerUsernames.length === 0 ? (
           <p className="py-8 text-center text-sm text-[#7A8599]">
             No live players
           </p>
@@ -61,3 +65,5 @@ export function PlayersList({
     </section>
   );
 }
+
+export const PlayersList = memo(PlayersListComponent);

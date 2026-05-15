@@ -1,14 +1,21 @@
+import { memo } from "react";
 import { PlayersList } from "./PlayersList";
-import { useGameStore } from "@/stores/game";
 
 type PlayersPanelProps = {
   isOpen: boolean;
   onClose: () => void;
 };
 
-export function PlayersPanel({ isOpen, onClose }: PlayersPanelProps) {
-  const players = useGameStore((state) => state.players);
+function PlayersPanelContent({ onClose }: { onClose: () => void }) {
+  return (
+    <PlayersList
+      className="h-full rounded-none border-y-0 border-r-0"
+      onClose={onClose}
+    />
+  );
+}
 
+function PlayersPanelComponent({ isOpen, onClose }: PlayersPanelProps) {
   return (
     <>
       <button
@@ -25,12 +32,10 @@ export function PlayersPanel({ isOpen, onClose }: PlayersPanelProps) {
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <PlayersList
-          players={players}
-          className="h-full rounded-none border-y-0 border-r-0"
-          onClose={onClose}
-        />
+        {isOpen ? <PlayersPanelContent onClose={onClose} /> : null}
       </aside>
     </>
   );
 }
+
+export const PlayersPanel = memo(PlayersPanelComponent);

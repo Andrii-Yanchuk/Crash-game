@@ -7,7 +7,7 @@ import { SoundToggleButton } from "./SoundToggleButton";
 import { UserButton } from "./UserButton";
 import { PlayersPanel } from "../players/PlayersPanel";
 import { useGameStore } from "@/stores/game";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 interface FooterProps {
@@ -36,10 +36,14 @@ export function Footer({ username, onLogout }: FooterProps) {
       isReconnecting,
     });
 
-  function closePlayersPanel() {
+  const openPlayersPanel = useCallback(() => {
+    setIsPlayersPanelOpen(true);
+  }, []);
+
+  const closePlayersPanel = useCallback(() => {
     playersButtonRef.current?.focus();
     setIsPlayersPanelOpen(false);
-  }
+  }, []);
 
   return (
     <>
@@ -54,7 +58,7 @@ export function Footer({ username, onLogout }: FooterProps) {
 
           <MobilePlayersButton
             buttonRef={playersButtonRef}
-            onClick={() => setIsPlayersPanelOpen(true)}
+            onClick={openPlayersPanel}
             playerCount={playerCount}
           />
         </div>
