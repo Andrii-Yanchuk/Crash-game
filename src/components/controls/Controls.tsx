@@ -35,13 +35,11 @@ export function Controls({ username }: ControlsProps) {
     isBetControlsDisabled,
   } = getBetControlState({ phase, myBet, isBetPending });
   const {
-    autoCashOutAt,
     defaultAmount,
     handleAmountChange,
     handleAutoCashOutAtBlur,
     handleAutoCashOutAtChange,
     handleQuickAction,
-    isAutoCashOutEnabled,
     submitBetAction,
     toggleAutoCashOut,
   } = useBetForm({
@@ -62,9 +60,7 @@ export function Controls({ username }: ControlsProps) {
       />
 
       <AutoCashOutToggle
-        autoCashOutAt={autoCashOutAt}
         disabled={isBetControlsDisabled}
-        isEnabled={isAutoCashOutEnabled}
         onAutoCashOutAtBlur={handleAutoCashOutAtBlur}
         onAutoCashOutAtChange={handleAutoCashOutAtChange}
         onToggle={toggleAutoCashOut}

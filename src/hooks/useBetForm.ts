@@ -10,7 +10,7 @@ import {
   parseDecimalInput,
 } from "@/lib/betInput";
 import type { RoundPhase } from "@/types/type";
-import { useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 
 type UseBetFormInput = {
   balance: number | null;
@@ -28,50 +28,61 @@ export function useBetForm({
   placeBet,
 }: UseBetFormInput) {
   const amountRef = useRef(DEFAULT_BET_AMOUNT);
-  const [autoCashOutAt, setAutoCashOutAt] = useState(
-    String(DEFAULT_AUTO_CASH_OUT_AT),
+  const autoCashOutAtRef = useRef(String(DEFAULT_AUTO_CASH_OUT_AT));
+  const isAutoCashOutEnabledRef = useRef(false);
+
+  const handleAmountChange = useCallback((nextAmount: number) => {
+    amountRef.current = nextAmount;
+  }, []);
+
+  const handleQuickAction = useCallback(
+    (action: QuickBetAction, currentAmount: number) => {
+      if (isBetControlsDisabled) {
+        return currentAmount;
+      }
+
+      const nextAmount =
+        action === "half"
+          ? currentAmount / 2
+          : action === "double"
+            ? currentAmount * 2
+            : typeof balance === "number"
+              ? balance
+              : currentAmount;
+
+      amountRef.current = nextAmount;
+      return nextAmount;
+    },
+    [balance, isBetControlsDisabled],
   );
-  const [isAutoCashOutEnabled, setIsAutoCashOutEnabled] = useState(false);
 
-  function handleAmountChange(nextAmount: number) {
-    amountRef.current = nextAmount;
-  }
+  const handleAutoCashOutAtChange = useCallback(
+    (nextAutoCashOutAt: string) => {
+      if (!isValidDecimalInput(nextAutoCashOutAt)) {
+        return false;
+      }
 
-  function handleQuickAction(action: QuickBetAction, currentAmount: number) {
-    if (isBetControlsDisabled) {
-      return currentAmount;
-    }
+      autoCashOutAtRef.current = nextAutoCashOutAt;
+      return true;
+    },
+    [],
+  );
 
-    const nextAmount =
-      action === "half"
-        ? currentAmount / 2
-        : action === "double"
-          ? currentAmount * 2
-          : typeof balance === "number"
-            ? balance
-            : currentAmount;
-
-    amountRef.current = nextAmount;
-    return nextAmount;
-  }
-
-  function handleAutoCashOutAtChange(nextAutoCashOutAt: string) {
-    if (isValidDecimalInput(nextAutoCashOutAt)) {
-      setAutoCashOutAt(nextAutoCashOutAt);
-    }
-  }
-
-  function handleAutoCashOutAtBlur() {
-    setAutoCashOutAt((value) =>
-      String(normalizeAutoCashOutAt(parseDecimalInput(value))),
+  const handleAutoCashOutAtBlur = useCallback(() => {
+    const nextAutoCashOutAt = String(
+      normalizeAutoCashOutAt(parseDecimalInput(autoCashOutAtRef.current)),
     );
-  }
 
-  function toggleAutoCashOut() {
-    setIsAutoCashOutEnabled((value) => !value);
-  }
+    autoCashOutAtRef.current = nextAutoCashOutAt;
 
-  function submitBetAction() {
+    return nextAutoCashOutAt;
+  }, []);
+
+  const toggleAutoCashOut = useCallback((isEnabled: boolean) => {
+    isAutoCashOutEnabledRef.current = isEnabled;
+  }, []);
+
+  const submitBetAction = useCallback(() => {
     if (phase === "tick") {
       cashOut();
       return;
@@ -79,20 +90,18 @@ export function useBetForm({
 
     placeBet({
       amount: amountRef.current,
-      autoCashOutAt: isAutoCashOutEnabled
-        ? normalizeAutoCashOutAt(parseDecimalInput(autoCashOutAt))
+      autoCashOutAt: isAutoCashOutEnabledRef.current
+        ? normalizeAutoCashOutAt(parseDecimalInput(autoCashOutAtRef.current))
         : null,
     });
-  }
+  }, [cashOut, phase, placeBet]);
 
   return {
-    autoCashOutAt,
     defaultAmount: DEFAULT_BET_AMOUNT,
     handleAmountChange,
     handleAutoCashOutAtChange,
     handleAutoCashOutAtBlur,
     handleQuickAction,
-    isAutoCashOutEnabled,
     submitBetAction,
     toggleAutoCashOut,
   };
