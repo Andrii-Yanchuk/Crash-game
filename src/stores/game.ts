@@ -1,13 +1,8 @@
 import { create } from "zustand";
-import { RoundPhase, MyBet, PublicPlayer, RoundStateEvent } from "../types/type";
+import { RoundPhase, MyBet, PublicPlayer } from "../types/type";
 
-function getPlayerCount(event: { playerCount?: number; players?: unknown[] }) {
-  return event.players?.length ?? event.playerCount ?? 0;
-}
-
-type GameState = {
+export type GameSnapshot = {
   balance: number | null;
-
   phase: RoundPhase;
   roundId: string | null;
   startedAt: Date | null;
@@ -24,7 +19,9 @@ type GameState = {
   isConnected: boolean;
   isReconnecting: boolean;
   connectionError: string | null;
+};
 
+type GameState = GameSnapshot & {
   setBalance: (balance: number) => void;
   setIsBetPending: (isBetPending: boolean) => void;
   setBetError: (betError: string | null) => void;
@@ -32,8 +29,6 @@ type GameState = {
   setIsConnected: (isConnected: boolean) => void;
   setIsReconnecting: (isReconnecting: boolean) => void;
   setConnectionError: (connectionError: string | null) => void;
-  upsertPlayer: (player: PublicPlayer) => void;
-  applyRoundState: (event: RoundStateEvent) => void;
 };
 
 export const useGameStore = create<GameState>((set) => ({
@@ -62,37 +57,4 @@ export const useGameStore = create<GameState>((set) => ({
   setIsConnected: (isConnected) => set({ isConnected }),
   setIsReconnecting: (isReconnecting) => set({ isReconnecting }),
   setConnectionError: (connectionError) => set({ connectionError }),
-  upsertPlayer: (player) =>
-    set((state) => {
-      const playerIndex = state.players.findIndex(
-        (item) => item.username === player.username,
-      );
-      const players =
-        playerIndex === -1
-          ? [...state.players, player]
-          : state.players.map((item, index) =>
-              index === playerIndex ? { ...item, ...player } : item,
-            );
-
-      return {
-        players,
-        playerCount: players.length,
-      };
-    }),
-
-  applyRoundState: (event) =>
-    set({
-      phase: event.phase,
-      roundId: event.roundId,
-      startedAt: event.startedAt ? new Date(event.startedAt) : null,
-      endsAt: event.endsAt ? new Date(event.endsAt) : null,
-      multiplier: event.currentMultiplier,
-      crashPoint: event.crashPoint,
-      myBet: event.yourBet,
-      ...(event.yourBet ? { lastProfit: null } : null),
-      players: event.players ?? [],
-      playerCount: getPlayerCount(event),
-      isBetPending: false,
-      betError: null,
-    }),
 }));

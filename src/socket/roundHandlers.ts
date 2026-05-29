@@ -1,6 +1,7 @@
 import { useGameStore } from "@/stores/game";
 import { useMultiplierStore } from "@/stores/multiplier";
 import { useRecentStore } from "@/stores/recent";
+import { applyGameEvent } from "./gameReducer";
 import {
   RoundCrashEvent,
   RoundStartEvent,
@@ -10,10 +11,6 @@ import {
 } from "@/types/type";
 
 let crashFlashTimeout: ReturnType<typeof setTimeout> | null = null;
-
-function getPlayerCount(event: { playerCount?: number; players?: unknown[] }) {
-  return event.players?.length ?? event.playerCount ?? 0;
-}
 
 function getCrashTier(crashPoint: number) {
   if (crashPoint >= 10) {
@@ -38,41 +35,24 @@ export function clearCrashFlashTimeout() {
 
 export function handleRoundState(event: RoundStateEvent) {
   useMultiplierStore.getState().setMultiplier(event.currentMultiplier);
-  useGameStore.getState().applyRoundState(event);
+  useGameStore.setState((state) =>
+    applyGameEvent(state, { type: "round:state", payload: event }),
+  );
 }
 
 export function handleRoundWaiting(event: RoundWaitingEvent) {
   clearCrashFlashTimeout();
 
-  useGameStore.setState({
-    phase: "waiting",
-    roundId: event.roundId,
-    startedAt: null,
-    endsAt: new Date(event.endsAt),
-    multiplier: 1,
-    crashPoint: null,
-    crashFlash: false,
-    myBet: null,
-    lastProfit: null,
-    players: event.players ?? [],
-    playerCount: getPlayerCount(event),
-  });
+  useGameStore.setState((state) =>
+    applyGameEvent(state, { type: "round:waiting", payload: event }),
+  );
   useMultiplierStore.getState().setMultiplier(1);
 }
 
 export function handleRoundStart(event: RoundStartEvent) {
-  useGameStore.setState({
-    phase: "starting",
-    roundId: event.roundId,
-    startedAt: new Date(event.startedAt),
-    endsAt: null,
-    multiplier: 1,
-    crashPoint: null,
-    crashFlash: false,
-    lastProfit: null,
-    players: event.players ?? [],
-    playerCount: getPlayerCount(event),
-  });
+  useGameStore.setState((state) =>
+    applyGameEvent(state, { type: "round:start", payload: event }),
+  );
   useMultiplierStore.getState().setMultiplier(1);
 }
 
@@ -84,26 +64,9 @@ export function handleRoundTick(event: RoundTickEvent) {
   }
 
   useMultiplierStore.getState().setMultiplier(event.multiplier);
-
-  useGameStore.setState((state) => {
-    const nextPhase = state.phase === "running" ? state.phase : "running";
-    const nextPlayerCount =
-      typeof event.playerCount === "number"
-        ? event.playerCount
-        : state.playerCount;
-
-    if (
-      state.phase === nextPhase &&
-      state.playerCount === nextPlayerCount
-    ) {
-      return state;
-    }
-
-    return {
-      phase: nextPhase,
-      playerCount: nextPlayerCount,
-    };
-  });
+  useGameStore.setState((state) =>
+    applyGameEvent(state, { type: "round:tick", payload: event }),
+  );
 }
 
 export function handleRoundCrash(event: RoundCrashEvent) {
@@ -114,16 +77,9 @@ export function handleRoundCrash(event: RoundCrashEvent) {
   }
 
   useMultiplierStore.getState().setMultiplier(event.crashPoint);
-
-  useGameStore.setState({
-    phase: "crashed",
-    roundId: event.roundId,
-    multiplier: event.crashPoint,
-    crashPoint: event.crashPoint,
-    crashFlash: true,
-    players: event.players ?? [],
-    playerCount: getPlayerCount(event),
-  });
+  useGameStore.setState((state) =>
+    applyGameEvent(state, { type: "round:crash", payload: event }),
+  );
 
   useRecentStore.getState().prepend({
     roundId: event.roundId,

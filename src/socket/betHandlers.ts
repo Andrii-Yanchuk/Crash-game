@@ -1,4 +1,5 @@
 import { useGameStore } from "@/stores/game";
+import { applyGameEvent } from "./gameReducer";
 import {
   BetCashedOutEvent,
   BetLostEvent,
@@ -7,45 +8,25 @@ import {
 } from "@/types/type";
 
 export function handleBetPlaced(event: BetPlacedEvent) {
-  useGameStore.setState({
-    balance: event.balance,
-    ...(typeof event.playerCount === "number"
-      ? { playerCount: event.playerCount }
-      : null),
-    isBetPending: false,
-    betError: null,
-    lastProfit: null,
-    myBet: {
-      betId: event.betId,
-      amount: event.amount,
-      autoCashOutAt: event.autoCashOutAt,
-      status: "placed",
-    },
-  });
+  useGameStore.setState((state) =>
+    applyGameEvent(state, { type: "bet:placed", payload: event }),
+  );
 }
 
 export function handleBetCashedOut(event: BetCashedOutEvent) {
-  useGameStore.setState({
-    balance: event.balance,
-    isBetPending: false,
-    betError: null,
-    lastProfit: event.profit,
-    myBet: null,
-  });
+  useGameStore.setState((state) =>
+    applyGameEvent(state, { type: "bet:cashedOut", payload: event }),
+  );
 }
 
 export function handleBetLost(event: BetLostEvent) {
-  useGameStore.setState({
-    balance: event.balance,
-    isBetPending: false,
-    lastProfit: null,
-    myBet: null,
-  });
+  useGameStore.setState((state) =>
+    applyGameEvent(state, { type: "bet:lost", payload: event }),
+  );
 }
 
 export function handleBetRejected(event: BetRejectedEvent) {
-  useGameStore.setState({
-    isBetPending: false,
-    betError: event.message,
-  });
+  useGameStore.setState((state) =>
+    applyGameEvent(state, { type: "bet:rejected", payload: event }),
+  );
 }

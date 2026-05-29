@@ -1,4 +1,5 @@
 import { useGameStore } from "@/stores/game";
+import { applyGameEvent } from "./gameReducer";
 import {
   PlayerBetEvent,
   PlayerCashoutEvent,
@@ -6,32 +7,19 @@ import {
 } from "@/types/type";
 
 export function handlePlayerBet(event: PlayerBetEvent) {
-  useGameStore.getState().upsertPlayer({
-    username: event.username,
-    amount: event.amount,
-    status: "placed",
-    multiplier: null,
-  });
+  useGameStore.setState((state) =>
+    applyGameEvent(state, { type: "players:bet", payload: event }),
+  );
 }
 
 export function handlePlayerCashout(event: PlayerCashoutEvent) {
-  const currentPlayer = useGameStore
-    .getState()
-    .players.find((player) => player.username === event.username);
-
-  useGameStore.getState().upsertPlayer({
-    username: event.username,
-    amount: currentPlayer?.amount ?? event.winAmount,
-    status: "cashed_out",
-    multiplier: event.multiplier,
-  });
+  useGameStore.setState((state) =>
+    applyGameEvent(state, { type: "players:cashout", payload: event }),
+  );
 }
 
 export function handlePlayerLost(event: PlayerLostEvent) {
-  useGameStore.getState().upsertPlayer({
-    username: event.username,
-    amount: event.amount,
-    status: "lost",
-    multiplier: null,
-  });
+  useGameStore.setState((state) =>
+    applyGameEvent(state, { type: "players:lost", payload: event }),
+  );
 }
