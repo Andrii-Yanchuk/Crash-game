@@ -1,0 +1,76 @@
+"use client";
+
+import { ConnectionStatus } from "./ConnectionStatus";
+import { getConnectionStatus, getDisplayedRoundId } from "./footerState";
+import { MobilePlayersButton } from "./MobilePlayersButton";
+import { SoundToggleButton } from "./SoundToggleButton";
+import { UserButton } from "./UserButton";
+import { PlayersPanel } from "../players/PlayersPanel";
+import { useGameStore } from "@/stores/game";
+import { useCallback, useRef, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
+
+interface FooterProps {
+  username: string;
+  onLogout: () => void;
+}
+
+export function Footer({ username, onLogout }: FooterProps) {
+  const [isPlayersPanelOpen, setIsPlayersPanelOpen] = useState(false);
+  const playersButtonRef = useRef<HTMLButtonElement>(null);
+  const { connectionError, isConnected, isReconnecting, playerCount, roundId } =
+    useGameStore(
+      useShallow((state) => ({
+        connectionError: state.connectionError,
+        isConnected: state.isConnected,
+        isReconnecting: state.isReconnecting,
+        playerCount: state.playerCount,
+        roundId: state.roundId,
+      })),
+    );
+  const displayedRoundId = getDisplayedRoundId(roundId);
+  const { dotClassName: connectionDotClassName, label: connectionLabel } =
+    getConnectionStatus({
+      connectionError,
+      isConnected,
+      isReconnecting,
+    });
+
+  const openPlayersPanel = useCallback(() => {
+    setIsPlayersPanelOpen(true);
+  }, []);
+
+  const closePlayersPanel = useCallback(() => {
+    playersButtonRef.current?.focus();
+    setIsPlayersPanelOpen(false);
+  }, []);
+
+  return (
+    <>
+      <footer className="fixed inset-x-0 bottom-0 z-40 flex h-10 items-center justify-between border-t border-[#1A1F2E] bg-[#0B0E16] px-4 text-[#7A8599]">
+        <div className="flex min-w-0 items-center gap-3">
+          <ConnectionStatus
+            connectionDotClassName={connectionDotClassName}
+            connectionLabel={connectionLabel}
+            displayedRoundId={displayedRoundId}
+            playerCount={playerCount}
+          />
+
+          <MobilePlayersButton
+            buttonRef={playersButtonRef}
+            onClick={openPlayersPanel}
+            playerCount={playerCount}
+          />
+        </div>
+
+        <div className="flex items-center gap-3">
+          <UserButton username={username} onLogout={onLogout} />
+
+          <SoundToggleButton />
+        </div>
+      </footer>
+
+      <PlayersPanel isOpen={isPlayersPanelOpen} onClose={closePlayersPanel} />
+    </>
+  );
+}
