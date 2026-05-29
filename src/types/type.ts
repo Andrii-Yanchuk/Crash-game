@@ -1,5 +1,7 @@
-export type RoundPhase = "waiting" | "start" | "tick" | "crash";
-export type ServerRoundPhase = RoundPhase | "running" | "crashed";
+export type RoundPhase = "waiting" | "starting" | "running" | "crashed";
+// What the backend actually sends in the round:state payload. "starting" is a
+// frontend-only transient derived from the round:start event, so it is not here.
+export type RoundStatePhase = "waiting" | "running" | "crashed";
 export type PlayerStatus = "watching" | "placed" | "cashed_out" | "lost";
 
 export type PublicPlayer = {
@@ -22,7 +24,7 @@ export type Bet = {
 };
 
 export interface RoundStateEvent {
-  phase: ServerRoundPhase;
+  phase: RoundStatePhase;
   roundId: string;
   startedAt: string | null;
   endsAt: string | null;

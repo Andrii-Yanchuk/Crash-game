@@ -7,17 +7,17 @@ const BET_BUTTON_STATE = {
     className: "bg-[#FBBF24] text-black",
     disabled: false,
   },
-  start: {
+  starting: {
     label: "Wait for next round",
     className: "bg-[#4A5568] text-white",
     disabled: true,
   },
-  tick: {
+  running: {
     label: "Cash Out",
     className: "bg-[#22C55E] text-black",
     disabled: false,
   },
-  crash: {
+  crashed: {
     label: "Crashed",
     className: "bg-[#EF4444] text-white",
     disabled: true,
@@ -43,10 +43,10 @@ export function getBetControlState({
   isBetPending,
 }: BetControlStateInput) {
   const hasPlacedBet = phase === "waiting" && Boolean(myBet);
-  const canCashOut = phase === "tick" && Boolean(myBet);
-  const isWaitingForNextRound = phase === "tick" && !myBet;
+  const canCashOut = phase === "running" && Boolean(myBet);
+  const isWaitingForNextRound = phase === "running" && !myBet;
   const displayedBetButtonState = isWaitingForNextRound
-    ? BET_BUTTON_STATE.start
+    ? BET_BUTTON_STATE.starting
     : BET_BUTTON_STATE[phase];
   const isBetButtonDisabled =
     displayedBetButtonState.disabled ||

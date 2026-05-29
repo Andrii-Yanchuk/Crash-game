@@ -1,4 +1,4 @@
-import { socket } from "@/lib/socket";
+import { getSocket } from "@/lib/socket";
 import {
   handleBetCashedOut,
   handleBetLost,
@@ -14,20 +14,20 @@ type SoundRef = {
 
 export function useBetSocketEvents(playWinSoundRef: SoundRef) {
   useEffect(() => {
+    const socket = getSocket();
+
     function handleBetCashedOutWithSound(event: BetCashedOutEvent) {
       handleBetCashedOut(event);
       playWinSoundRef.current();
     }
 
     socket.on("bet:placed", handleBetPlaced);
-    socket.on("bet:cashout", handleBetCashedOutWithSound);
     socket.on("bet:cashedOut", handleBetCashedOutWithSound);
     socket.on("bet:lost", handleBetLost);
     socket.on("bet:rejected", handleBetRejected);
 
     return () => {
       socket.off("bet:placed", handleBetPlaced);
-      socket.off("bet:cashout", handleBetCashedOutWithSound);
       socket.off("bet:cashedOut", handleBetCashedOutWithSound);
       socket.off("bet:lost", handleBetLost);
       socket.off("bet:rejected", handleBetRejected);

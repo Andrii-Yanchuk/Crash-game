@@ -67,7 +67,7 @@ export function Controls({ username }: ControlsProps) {
       />
 
       <BetSubmitButton
-        betAmount={phase === "tick" && myBet ? myBet.amount : null}
+        betAmount={phase === "running" && myBet ? myBet.amount : null}
         className={betButtonClassName}
         disabled={isBetButtonDisabled}
         label={betButtonLabel}

@@ -21,7 +21,6 @@ export type ServerToClientEvents = {
   "round:tick": (event: RoundTickEvent) => void;
   "round:crash": (event: RoundCrashEvent) => void;
   "bet:placed": (event: BetPlacedEvent) => void;
-  "bet:cashout": (event: BetCashedOutEvent) => void;
   "bet:cashedOut": (event: BetCashedOutEvent) => void;
   "bet:lost": (event: BetLostEvent) => void;
   "bet:rejected": (event: BetRejectedEvent) => void;

@@ -1,5 +1,5 @@
 import { MAX_BET_AMOUNT } from "@/config/bet";
-import { socket } from "@/lib/socket";
+import { getSocket } from "@/lib/socket";
 import { useGameStore } from "@/stores/game";
 import { getIsSoundEnabled } from "@/stores/sound";
 import { useCallback } from "react";
@@ -27,13 +27,13 @@ export function useBetActions() {
     const { phase, myBet, isBetPending, setBetError, setIsBetPending } =
       useGameStore.getState();
 
-    if (phase !== "tick" || !myBet || isBetPending) {
+    if (phase !== "running" || !myBet || isBetPending) {
       return;
     }
 
     setBetError(null);
     setIsBetPending(true);
-    socket.emit("bet:cashout", {});
+    getSocket().emit("bet:cashout", {});
   }, []);
 
   const placeBet = useCallback(({ amount, autoCashOutAt }: PlaceBetInput) => {
@@ -56,7 +56,7 @@ export function useBetActions() {
     if (getIsSoundEnabled()) {
       playBetSound();
     }
-    socket.emit("bet:place", {
+    getSocket().emit("bet:place", {
       amount,
       autoCashOutAt,
     });

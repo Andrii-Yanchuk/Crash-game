@@ -1,4 +1,4 @@
-import { socket } from "@/lib/socket";
+import { getSocket } from "@/lib/socket";
 import { useGameStore } from "@/stores/game";
 import { useEffect } from "react";
 
@@ -8,6 +8,8 @@ export function useSocketConnection(username: string | null) {
   const setConnectionError = useGameStore((state) => state.setConnectionError);
 
   useEffect(() => {
+    const socket = getSocket();
+
     function handleConnect() {
       setIsConnected(true);
       setIsReconnecting(false);
@@ -63,6 +65,8 @@ export function useSocketConnection(username: string | null) {
   }, [setConnectionError, setIsConnected, setIsReconnecting]);
 
   useEffect(() => {
+    const socket = getSocket();
+
     if (!username) {
       setIsConnected(false);
       setIsReconnecting(false);

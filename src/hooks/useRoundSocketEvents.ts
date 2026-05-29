@@ -1,4 +1,4 @@
-import { socket } from "@/lib/socket";
+import { getSocket } from "@/lib/socket";
 import {
   clearCrashFlashTimeout,
   handleRoundCrash,
@@ -16,6 +16,8 @@ type SoundRef = {
 
 export function useRoundSocketEvents(playLoseSoundRef: SoundRef) {
   useEffect(() => {
+    const socket = getSocket();
+
     function handleRoundCrashWithSound(event: RoundCrashEvent) {
       handleRoundCrash(event);
       playLoseSoundRef.current();

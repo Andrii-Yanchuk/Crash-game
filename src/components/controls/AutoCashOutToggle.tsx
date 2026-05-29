@@ -6,7 +6,7 @@ const DEFAULT_AUTO_CASH_OUT_AT_TEXT = String(DEFAULT_AUTO_CASH_OUT_AT);
 type AutoCashOutToggleProps = {
   disabled: boolean;
   onAutoCashOutAtBlur: () => string;
-  onAutoCashOutAtChange: (autoCashOutAt: string) => boolean;
+  onAutoCashOutAtChange: (autoCashOutAt: string) => string;
   onToggle: (isEnabled: boolean) => void;
 };
 
@@ -17,11 +17,9 @@ function AutoCashOutToggleComponent({
   onToggle,
 }: AutoCashOutToggleProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const autoCashOutAtRef = useRef(DEFAULT_AUTO_CASH_OUT_AT_TEXT);
 
   function handleAutoCashOutAtBlur() {
     const nextAutoCashOutAt = onAutoCashOutAtBlur();
-    autoCashOutAtRef.current = nextAutoCashOutAt;
 
     if (inputRef.current) {
       inputRef.current.value = nextAutoCashOutAt;
@@ -31,14 +29,11 @@ function AutoCashOutToggleComponent({
   function handleAutoCashOutAtChange(
     event: React.ChangeEvent<HTMLInputElement>,
   ) {
-    const nextAutoCashOutAt = event.target.value;
+    const displayedAutoCashOutAt = onAutoCashOutAtChange(event.target.value);
 
-    if (onAutoCashOutAtChange(nextAutoCashOutAt)) {
-      autoCashOutAtRef.current = nextAutoCashOutAt;
-      return;
+    if (event.target.value !== displayedAutoCashOutAt) {
+      event.target.value = displayedAutoCashOutAt;
     }
-
-    event.target.value = autoCashOutAtRef.current;
   }
 
   return (

@@ -1,4 +1,4 @@
-import { socket } from "@/lib/socket";
+import { getSocket } from "@/lib/socket";
 import {
   handlePlayerBet,
   handlePlayerCashout,
@@ -8,6 +8,8 @@ import { useEffect } from "react";
 
 export function usePlayerSocketEvents() {
   useEffect(() => {
+    const socket = getSocket();
+
     socket.on("players:bet", handlePlayerBet);
     socket.on("players:cashout", handlePlayerCashout);
     socket.on("players:lost", handlePlayerLost);

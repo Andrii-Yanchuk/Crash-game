@@ -62,7 +62,7 @@ export function handleRoundWaiting(event: RoundWaitingEvent) {
 
 export function handleRoundStart(event: RoundStartEvent) {
   useGameStore.setState({
-    phase: "start",
+    phase: "starting",
     roundId: event.roundId,
     startedAt: new Date(event.startedAt),
     endsAt: null,
@@ -86,7 +86,7 @@ export function handleRoundTick(event: RoundTickEvent) {
   useMultiplierStore.getState().setMultiplier(event.multiplier);
 
   useGameStore.setState((state) => {
-    const nextPhase = state.phase === "tick" ? state.phase : "tick";
+    const nextPhase = state.phase === "running" ? state.phase : "running";
     const nextPlayerCount =
       typeof event.playerCount === "number"
         ? event.playerCount
@@ -107,10 +107,16 @@ export function handleRoundTick(event: RoundTickEvent) {
 }
 
 export function handleRoundCrash(event: RoundCrashEvent) {
+  const currentRoundId = useGameStore.getState().roundId;
+
+  if (event.roundId !== currentRoundId) {
+    return;
+  }
+
   useMultiplierStore.getState().setMultiplier(event.crashPoint);
 
   useGameStore.setState({
-    phase: "crash",
+    phase: "crashed",
     roundId: event.roundId,
     multiplier: event.crashPoint,
     crashPoint: event.crashPoint,

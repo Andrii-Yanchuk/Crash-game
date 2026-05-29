@@ -56,17 +56,13 @@ export function useBetForm({
     [balance, isBetControlsDisabled],
   );
 
-  const handleAutoCashOutAtChange = useCallback(
-    (nextAutoCashOutAt: string) => {
-      if (!isValidDecimalInput(nextAutoCashOutAt)) {
-        return false;
-      }
-
+  const handleAutoCashOutAtChange = useCallback((nextAutoCashOutAt: string) => {
+    if (isValidDecimalInput(nextAutoCashOutAt)) {
       autoCashOutAtRef.current = nextAutoCashOutAt;
-      return true;
-    },
-    [],
-  );
+    }
+
+    return autoCashOutAtRef.current;
+  }, []);
 
   const handleAutoCashOutAtBlur = useCallback(() => {
     const nextAutoCashOutAt = String(
@@ -83,7 +79,7 @@ export function useBetForm({
   }, []);
 
   const submitBetAction = useCallback(() => {
-    if (phase === "tick") {
+    if (phase === "running") {
       cashOut();
       return;
     }

@@ -12,7 +12,7 @@ function getPhaseColor(phase: string, crashed: boolean) {
     return "#EF4444";
   }
 
-  if (phase === "waiting" || phase === "start") {
+  if (phase === "waiting" || phase === "starting") {
     return "#FBBF24";
   }
 
@@ -45,7 +45,7 @@ function drawCurve(
 
   ctx.clearRect(0, 0, width, height);
 
-  if (phase === "waiting" || phase === "start") {
+  if (phase === "waiting" || phase === "starting") {
     return;
   }
 
@@ -103,7 +103,7 @@ function CurveDisplayComponent() {
   const crashedRef = useRef(false);
   const phase = useGameStore((state) => state.phase);
   const endsAt = useGameStore((state) => state.endsAt);
-  const crashed = phase === "crash";
+  const crashed = phase === "crashed";
   const phaseColor = getPhaseColor(phase, crashed);
   const initialMultiplier = useMultiplierStore.getState().multiplier;
 
@@ -189,7 +189,7 @@ function CurveDisplayComponent() {
         </span>
       </div>
 
-      {phase === "waiting" || phase === "start" ? (
+      {phase === "waiting" || phase === "starting" ? (
         <div className="relative z-10 text-center">
           <div
             ref={countdownTextRef}
